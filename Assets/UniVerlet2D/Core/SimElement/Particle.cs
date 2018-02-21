@@ -15,6 +15,8 @@ namespace UniVerlet2D {
 
 		public Matrix4x4 worldMatrix { get { return Matrix4x4.TRS(_pos, Quaternion.identity, Vector3.one); } }
 
+		public Particle() : base(){ }
+
 		public Particle(Simulator sim, Vector2 pos) : base(sim){
 			this._oldPos = this._pos = pos;
 		}
@@ -24,6 +26,10 @@ namespace UniVerlet2D {
 			_oldPos = _pos;
 			_pos += _sim.settings.gravity * dt;
 			_pos += velocity;
+		}
+
+		protected override void BeforeSerializeToJson() {
+			
 		}
 
 		public override void AfterDeserializeFromJson(Simulator sim) {

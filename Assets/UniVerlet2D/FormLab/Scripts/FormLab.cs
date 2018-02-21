@@ -93,11 +93,16 @@ namespace UniVerlet2D.Lab {
 			}
 
 			// テスト
-			var p = _monoSim.sim.MakeParticle(Vector2.one);
-			var text = p.ExportJson();
-			Debug.Log(text);
-			var elem = (AngleConstraint)JsonUtility.FromJson(text, typeof(Particle));
-			Debug.Log(elem.uid);
+			// var formText = _monoSim.sim.ExportFormText();
+			// Debug.Log(formText.text);
+
+			string typeText = "UniVerlet2D.AngleConstraint";
+			AngleConstraint a = _monoSim.sim.MakeAngleByIdx(0, 1, 2, 1f);
+			string aJson = a.ExportJson();
+			Debug.Log(aJson);
+			SimElement elem = (SimElement)JsonUtility.FromJson(aJson, System.Type.GetType(typeText));
+			elem.AfterDeserializeFromJson(_monoSim.sim);
+			Debug.Log(elem.ExportJson());
 		}
 
 		void Update() {

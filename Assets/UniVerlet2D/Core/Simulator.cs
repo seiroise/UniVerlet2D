@@ -89,7 +89,7 @@ namespace UniVerlet2D {
 
 			// relax
 			for(var i = 0; i < numOfSprings; ++i) {
-				_springs[i].Relax(dt);
+				_springs[i].Step(dt);
 			}
 			for(var i = 0; i < numOfAngles; ++i) {
 				_angles[i].Relax(dt);
@@ -612,6 +612,33 @@ namespace UniVerlet2D {
 				var p = MakePinByUID(pi.a, pi.pos);
 				p.OverrideUID(pi.uid);
 			}
+		}
+
+		public FormText ExportFormText() {
+			FormText formText = new FormText();
+			var sb = new System.Text.StringBuilder();
+			for(var i = 0; i < numOfParticles; ++i) {
+				var e = GetParticleAt(i);
+				sb.AppendLine(string.Format("p {0}", e.ExportJson()));
+			}
+			sb.AppendLine();
+			for(var i = 0; i < numOfSprings; ++i) {
+				var e = GetSpringAt(i);
+				sb.AppendLine(string.Format("sc {0}", e.ExportJson()));
+			}
+			sb.AppendLine();
+			for(var i = 0; i < numOfAngles; ++i) {
+				var e = GetAngleAt(i);
+				sb.AppendLine(string.Format("ac {0}", e.ExportJson()));
+			}
+			sb.AppendLine();
+			for(var i = 0; i < numOfPins; ++i) {
+				var e = GetPinAt(i);
+				sb.AppendLine(string.Format("pc {0}", e.ExportJson()));
+			}
+
+			formText.text = sb.ToString();
+			return formText;
 		}
 	}
 }

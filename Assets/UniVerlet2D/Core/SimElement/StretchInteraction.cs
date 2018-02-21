@@ -7,7 +7,11 @@ namespace UniVerlet2D {
 	public class StretchInteraction : Interaction {
 
 		Particle _a, _b;
+
+		[SerializeField]
 		float _power;
+		[SerializeField]
+		int _aUID, _bUID;
 
 		public Particle a { get { return _a; } }
 		public Particle b { get { return _b; } }
@@ -28,6 +32,25 @@ namespace UniVerlet2D {
 				_a.pos += dir;
 				_b.pos -= dir;
 			}
+		}
+
+		public override void Step(float dt) {
+			if(on) {
+				var dir = (_b.pos - _a.pos) * dt;
+				_a.pos += dir;
+				_b.pos -= dir;
+			}
+		}
+
+		protected override void BeforeSerializeToJson() {
+			_aUID = _a.uid;
+			_bUID = _b.uid;
+		}
+
+		public override void AfterDeserializeFromJson(Simulator sim) {
+			_sim = sim;
+			_a = sim.GetParticleByUID(_aUID);
+			_b= sim.GetParticleByUID(_bUID);
 		}
 
 		public override bool ContainParticle(Particle p) {

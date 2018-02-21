@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace UniVerlet2D {
 
-	public abstract class SimElement {
+	public class SimElement {
 
 		/*
 		 * Fields
@@ -24,6 +24,8 @@ namespace UniVerlet2D {
 		 * Constructor
 		 */
 
+		public SimElement() { }
+
 		public SimElement(Simulator sim) {
 			_sim = sim;
 			_uid = sim.uidDistributer.next;
@@ -38,6 +40,7 @@ namespace UniVerlet2D {
 		}
 
 		public string ExportJson() {
+			BeforeSerializeToJson();
 			return JsonUtility.ToJson(this);
 		}
 
@@ -45,8 +48,10 @@ namespace UniVerlet2D {
 		 * Abstract methods
 		 */
 
-		public abstract void AfterDeserializeFromJson(Simulator sim);
+		protected virtual void BeforeSerializeToJson() { }
 
-		public abstract void Step(float dt);
+		public virtual void AfterDeserializeFromJson(Simulator sim) { }
+
+		public virtual void Step(float dt) { }
 	}
 }

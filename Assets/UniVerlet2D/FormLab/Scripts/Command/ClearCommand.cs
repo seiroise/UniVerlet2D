@@ -9,7 +9,6 @@ namespace UniVerlet2D.Lab {
 		Simulator _sim;
 		MarkerManager _marker;
 
-
 		public string name { get { return "Clear"; } }
 
 		public bool Do() {

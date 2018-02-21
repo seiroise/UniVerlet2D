@@ -4,10 +4,14 @@ using UnityEngine;
 
 namespace UniVerlet2D {
 
-	public class PinConstraint : SimElement, IConstraint {
+	public class PinConstraint : SimElement, IParticleHolder {
 
 		Particle _a;
+
+		[SerializeField]
 		Vector2 _pos;
+		[SerializeField]
+		int _aUID;
 
 		public Particle a { get { return _a; } }
 		public Vector2 pos { get { return _pos; } }
@@ -19,6 +23,19 @@ namespace UniVerlet2D {
 
 		public void Relax(float dt) {
 			_a.pos = _pos;
+		}
+
+		public override void Step(float dt) {
+			_a.pos = _pos;
+		}
+
+		protected override void BeforeSerializeToJson() {
+			_aUID = _a.uid;
+		}
+
+		public override void AfterDeserializeFromJson(Simulator sim) {
+			_sim = sim;
+			_a = sim.GetParticleByUID(_aUID);
 		}
 
 		public bool ContainParticle(Particle p) {

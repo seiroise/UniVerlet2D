@@ -4,12 +4,19 @@ using UnityEngine;
 
 namespace UniVerlet2D {
 
-	public class SpringConstraint : SimElement, IConstraint {
+	public class SpringConstraint : SimElement, IParticleHolder {
 
 		Particle _a, _b;
+
+		[SerializeField]
 		float _stiffness;
+		[SerializeField]
 		float _length;
+		[SerializeField]
 		float _sqrLength;
+
+		[SerializeField]
+		int _aUID, _bUID;
 
 		public Particle a { get { return _a; } }
 		public Particle b { get { return _b; } }
@@ -31,12 +38,23 @@ namespace UniVerlet2D {
 			_sqrLength = (a.pos - b.pos).sqrMagnitude;
 		}
 
-		public void Relax(float dt) {
+		public override void Step(float dt) {
 			var normal = _a.pos - _b.pos;
 			var sqrLength = normal.sqrMagnitude;
 			normal *= ((_sqrLength - sqrLength) / sqrLength) * _stiffness * dt * _sim.settings.springConstant;
 			_a.pos += normal;
 			_b.pos -= normal;
+		}
+
+		protected override void BeforeSerializeToJson() {
+			_aUID = _a.uid;
+			_bUID = _b.uid;
+		}
+
+		public override void AfterDeserializeFromJson(Simulator sim) {
+			_sim = sim;
+			_a = sim.GetParticleByUID(_aUID);
+			_b = sim.GetParticleByUID(_bUID);
 		}
 
 		public bool ContainParticle(Particle p) {

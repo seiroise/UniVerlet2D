@@ -7,7 +7,11 @@ namespace UniVerlet2D {
 	public class TranslationInteraction : Interaction {
 
 		Particle _a;
+
+		[SerializeField]
 		Vector2 _velocity;
+		[SerializeField]
+		int _aUID;
 
 		public Vector2 velocity { get { return _velocity; } set { _velocity = value; } }
 
@@ -20,6 +24,21 @@ namespace UniVerlet2D {
 			if(on) {
 				_a.pos += _velocity * dt;
 			}
+		}
+
+		public override void Step(float dt) {
+			if(on) {
+				_a.pos += _velocity * dt;
+			}
+		}
+
+		protected override void BeforeSerializeToJson() {
+			_aUID = _a.uid;
+		}
+
+		public override void AfterDeserializeFromJson(Simulator sim) {
+			_sim = sim;
+			_a = sim.GetParticleByUID(_aUID);
 		}
 
 		public override bool ContainParticle(Particle p) {
