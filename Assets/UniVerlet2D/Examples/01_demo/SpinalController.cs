@@ -33,7 +33,7 @@ namespace UniVerlet2D.Examples {
 		void Awake() {
 			var sim = monoSim.sim;
 			_simRenderer = GetComponent<SimRenderer>();
-			_translation = new TranslationInteraction(sim, sim.GetParticleAt(0), new Vector2(0f, 0f));
+			_translation = new TranslationInteraction(sim.GetParticleAt(0), new Vector2(0f, 0f));
 			// sim.AddInteraction(_translation);
 		}
 

@@ -33,6 +33,16 @@ namespace UniVerlet2D.Lab {
 		 * Methods
 		 */
 
+		public override SimElement MakeSimElement(AlignedEditableForm aef, List<SimElement> simElements) {
+			var a = simElements[aef.uid2idxDic[_aUID]] as Particle;
+			var b = simElements[aef.uid2idxDic[_bUID]] as Particle;
+
+			var sc = new SpringConstraint(a, b, _stiffness);
+			sc.OverrideUID(uid);
+
+			return sc;
+		}
+
 		public override bool SetParams(int uid, string profileID, object[] args) {
 			base.SetParams(uid, profileID, args);
 
@@ -49,10 +59,6 @@ namespace UniVerlet2D.Lab {
 			_stiffness = 1f;
 
 			return true;
-		}
-
-		public override SimElement MakeSimElement(Simulator sim) {
-			return null;
 		}
 
 		public override void AfterImportJson(EditableForm form) {

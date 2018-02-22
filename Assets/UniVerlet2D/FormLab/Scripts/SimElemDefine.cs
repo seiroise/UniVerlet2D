@@ -49,6 +49,12 @@ namespace UniVerlet2D.Lab {
 			public Type makeSimElemInfoType;        // 作成するSimElementを作成するための"仮実装クラス"の型情報
 			public string markerID;                 // 対応するマーカーのID
 			public float markerDepth;               // マーカーの表示深度
+
+			// 描画情報
+			public bool canRender;                  // 描画できるかどうか
+
+			// デバッグ情報
+			public bool canDrag;					// つまんで動かせる
 		}
 
 		static Dictionary<string, SimElemProfile> elemProfileDic = new Dictionary<string, SimElemProfile>() {
@@ -70,6 +76,8 @@ namespace UniVerlet2D.Lab {
 					makeSimElemInfoType = typeof(ParticleInfo),
 					markerID = PARTICLE_ID,
 					markerDepth = 0f,
+
+					canRender = true,
 				}
 			},
 			{
@@ -91,6 +99,8 @@ namespace UniVerlet2D.Lab {
 					makeSimElemInfoType = typeof(SpringConstraintInfo),
 					markerID = SPRING_ID,
 					markerDepth = 1,
+
+					canRender = true,
 				}
 			},
 			{
@@ -112,6 +122,8 @@ namespace UniVerlet2D.Lab {
 					makeSimElemInfoType = typeof(AngleConstraintInfo),
 					markerID = ANGLE_ID,
 					markerDepth = 2,
+
+					canRender = false,
 				}
 			},
 			{
@@ -133,6 +145,8 @@ namespace UniVerlet2D.Lab {
 					makeSimElemInfoType = typeof(PinConstraintInfo),
 					markerID = PIN_ID,
 					markerDepth = -1,
+
+					canRender = false,
 				}
 			},
 		};

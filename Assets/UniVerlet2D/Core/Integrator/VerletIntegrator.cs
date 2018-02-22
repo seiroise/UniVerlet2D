@@ -12,7 +12,6 @@ namespace UniVerlet2D {
 
 		[SerializeField]
 		SimSettings _settings;
-
 		List<SimElement> _simElements;
 
 		/*
@@ -59,8 +58,10 @@ namespace UniVerlet2D {
 		 * Import / Export
 		 */
 
-		public void ImportFromSimElementList(List<SimElement> simElementList) {
-			
+		public void ImportFromSimElementList(List<SimElement> simElements) {
+			_simElements.Clear();
+
+			_simElements = simElements;
 		}
 	}
 }

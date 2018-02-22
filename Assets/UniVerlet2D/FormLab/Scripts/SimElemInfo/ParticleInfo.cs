@@ -13,12 +13,15 @@ namespace UniVerlet2D.Lab {
 
 		[SerializeField]
 		Vector2 _pos;
+		[SerializeField]
+		float _damping;
 
 		/*
 		 * Properties
 		 */
 
 		public Vector2 pos { get { return _pos; } set { _pos = value; } }
+		public float damping { get { return _damping; } set { _damping = value; } }
 
 		/*
 		 * Methods
@@ -32,12 +35,16 @@ namespace UniVerlet2D.Lab {
 			}
 			Vector2 pos = (args[0] as Nullable<Vector2>).Value;
 			_pos = pos;
+
+			_damping = 0.9f;
+
 			return true;
 		}
 
-		public override SimElement MakeSimElement(Simulator sim) {
-			var p = sim.MakeParticle(_pos);
+		public override SimElement MakeSimElement(AlignedEditableForm aef, List<SimElement> simElements) {
+			var p = new Particle(_pos, _damping);
 			p.OverrideUID(uid);
+
 			return p;
 		}
 

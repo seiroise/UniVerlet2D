@@ -203,19 +203,35 @@ namespace UniVerlet2D.Lab {
 			}
 		}
 
-		public List<SimElemInfo> ExportAlignedSimElemList() {
-			List<SimElemInfo> alignedSimElements = new List<SimElemInfo>();
+		public AlignedEditableForm ExportAlignedEditableForm() {
+			List<SimElemInfo> alignedSimElemInfo = new List<SimElemInfo>();
 
 			List<int> sortedKeys = GetSortedKeyList();
+			Dictionary<int, int> uid2idxDic = new Dictionary<int, int>();
+
+			List<int> renderedSimElemIdx = new List<int>();
+
+			bool canRender;
 
 			for(int i = 0; i < sortedKeys.Count; ++i) {
 				var group = _elemGroupDic[sortedKeys[i]];
-				for(var j = 0; j < group.numElems; ++i) {
-					alignedSimElements.Add(group.GetAt(j));
+				canRender = group.profile.canRender;
+				for(var j = 0; j < group.numElems; ++j) {
+					if(canRender) {
+						renderedSimElemIdx.Add(alignedSimElemInfo.Count);
+					}
+					var elemInfo = group.GetAt(j);
+					uid2idxDic.Add(elemInfo.uid, alignedSimElemInfo.Count);
+					alignedSimElemInfo.Add(elemInfo);
 				}
 			}
 
-			return alignedSimElements;
+			var exportForm = new AlignedEditableForm();
+			exportForm.simElemInfos = alignedSimElemInfo;
+			exportForm.uid2idxDic = uid2idxDic;
+			exportForm.renderedSimElemIdx = renderedSimElemIdx;
+
+			return exportForm;
 		}
 	}
 }

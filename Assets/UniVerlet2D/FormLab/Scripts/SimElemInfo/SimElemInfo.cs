@@ -32,7 +32,7 @@ namespace UniVerlet2D.Lab {
 			return true;
 		}
 
-		public abstract SimElement MakeSimElement(Simulator sim);
+		public abstract SimElement MakeSimElement(AlignedEditableForm aef, List<SimElement> simElements);
 
 		public abstract void AfterImportJson(EditableForm form);
 

@@ -29,8 +29,13 @@ namespace UniVerlet2D.Lab {
 		 * Methods
 		 */
 
-		public override SimElement MakeSimElement(Simulator sim) {
-			return null;
+		public override SimElement MakeSimElement(AlignedEditableForm aef, List<SimElement> simElements) {
+			var a = simElements[aef.uid2idxDic[_aUID]] as Particle;
+
+			var pc = new PinConstraint(a, _pos);
+			pc.OverrideUID(uid);
+
+			return pc;
 		}
 
 		public override bool SetParams(int uid, string profileID, object[] args) {

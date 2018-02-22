@@ -63,9 +63,14 @@ namespace UniVerlet2D.Lab {
 		int _draggedIdx;
 		Particle _draggedParticle;
 
+		[Header("try now")]
+
 		// editable form
 		EditableForm _editableForm;
 		string _formattedText;
+
+		VerletIntegrator _integrator;
+		public IntegratorRenderer integratorRenderer;
 
 		/*
 		 * Properties
@@ -88,6 +93,9 @@ namespace UniVerlet2D.Lab {
 			_editModeDic.Add(EditMode.Angle, new AngleEditModeOperator(this));
 
 			_editableForm = new EditableForm();
+
+			_integrator = new VerletIntegrator();
+			_integrator.Init();
 		}
 
 		void Start() {
@@ -130,6 +138,10 @@ namespace UniVerlet2D.Lab {
 					_currentEditMode.Update();
 				}
 			}
+
+			if(_mode == Mode.Play) {
+				integratorRenderer.SetMesh(_integrator);
+			}
 		}
 
 		/*
@@ -159,8 +171,10 @@ namespace UniVerlet2D.Lab {
 			_monoSim.updateSim = true;
 			_simRenderer.updateMesh = true;
 
-			_formattedText = _editableForm.ExportFormattedText();
-			Debug.Log(_formattedText);
+			// テスト
+			var aef = _editableForm.ExportAlignedEditableForm();
+			_integrator.ImportFromSimElementList(aef.ExportSimElements());
+			integratorRenderer.renderedSimElemIdx = aef.renderedSimElemIdx;
 
 			// _simRelatedForm = _monoSim.sim.ExportRelatedForm();
 		}
@@ -173,7 +187,7 @@ namespace UniVerlet2D.Lab {
 			_simRenderer.Clear();
 			_simRenderer.updateMesh = false;
 
-			_editableForm.ImportFormattedText(_formattedText);
+			// _editableForm.ImportFormattedText(_formattedText);
 
 			// _monoSim.sim.ImportRelatedForm(_simRelatedForm);
 
