@@ -273,6 +273,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   initNum: 16
   addNum: 16
+  markerPrefs: []
   particleMarkerPref: {fileID: 114475219786481512, guid: c18d7e7035899422a91e4ca6aea2e47e,
     type: 2}
   particleMarkerDepth: 0
@@ -2573,6 +2574,7 @@ GameObject:
   m_Component:
   - component: {fileID: 685008423}
   - component: {fileID: 685008424}
+  - component: {fileID: 685008425}
   m_Layer: 0
   m_Name: FormLab
   m_TagString: Untagged
@@ -2629,6 +2631,7 @@ MonoBehaviour:
       _min: 30
       _max: 60
   connectionGuide: {fileID: 1310531414}
+  elemMaker: {fileID: 685008425}
   _commandStack:
     _cmdPtr: -1
     _onChangeCommandPtr:
@@ -2636,6 +2639,33 @@ MonoBehaviour:
         m_Calls: []
       m_TypeName: UniVerlet2D.Lab.CommandStack+CommandPtrEvent, Assembly-CSharp, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
+--- !u!114 &685008425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 685008422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1a13db056ebe433792646402b197749, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onMakeSimElement:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 685008424}
+        m_MethodName: OnMakeSimElemInfo
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_TypeName: UniVerlet2D.Lab.SimElemMaker+SimElementEvent, Assembly-CSharp, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
 --- !u!1 &686972543
 GameObject:
   m_ObjectHideFlags: 0

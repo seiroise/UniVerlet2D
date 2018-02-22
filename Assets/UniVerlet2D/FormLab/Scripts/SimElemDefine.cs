@@ -15,9 +15,9 @@ namespace UniVerlet2D.Lab {
 		}
 
 		public enum SimElemType {
-			Basic,								// 基本要素
-			Constraint,							// 制約要素
-			Interaction,						// 作用要素
+			Basic,                              // 基本要素
+			Constraint,                         // 制約要素
+			Interaction,                        // 作用要素
 		}
 
 		// SimElementの作成方法
@@ -30,9 +30,9 @@ namespace UniVerlet2D.Lab {
 
 		public class SimElemProfile {
 			// 基本情報
-			public string id;               // profileを表すためのID
+			public string profileID;        // profileを表すためのID
 			public SimElemAttr attr;        // 外部からSimElementを把握するための属性
-			public SimElemType type;		// 外部からSimElementを把握するための種類
+			public SimElemType type;        // 外部からSimElementを把握するための種類
 			public Type makeSimElemType;    // 作成するSimElementを作成すルための型情報
 
 			// 処理情報
@@ -43,17 +43,19 @@ namespace UniVerlet2D.Lab {
 			public string header;           // 外部データとして書き出す時のヘッダ
 
 			// 編集情報
-			public SimElemMakeMethod makeMethod;    //このSimElementを作成するための方法
+			public SimElemMakeMethod makeMethod;    // このSimElementを作成するための方法
+			public SimElemAttr detectedMarkerAttr;  // 作成するときに検知する属性
 			public int needMakingElemNum;           // makeMethodがClickParticleまたはClickParticleInParticularOrderの場合に使用する。
 			public Type makeSimElemInfoType;        // 作成するSimElementを作成するための"仮実装クラス"の型情報
 			public string markerID;                 // 対応するマーカーのID
+			public float markerDepth;               // マーカーの表示深度
 		}
 
 		static Dictionary<string, SimElemProfile> elemProfileDic = new Dictionary<string, SimElemProfile>() {
 			{
 				PARTICLE_ID,
 				new SimElemProfile() {
-					id = PARTICLE_ID,
+					profileID = PARTICLE_ID,
 					attr = SimElemAttr.Particle,
 					type = SimElemType.Basic,
 					makeSimElemType = typeof(Particle),
@@ -66,13 +68,14 @@ namespace UniVerlet2D.Lab {
 					makeMethod = SimElemMakeMethod.ClickSpace,
 					needMakingElemNum = 0,
 					makeSimElemInfoType = typeof(ParticleInfo),
-					markerID = PARTICLE_ID
+					markerID = PARTICLE_ID,
+					markerDepth = 0f,
 				}
 			},
 			{
 				SPRING_ID,
 				new SimElemProfile() {
-					id = SPRING_ID,
+					profileID = SPRING_ID,
 					attr = SimElemAttr.Spring,
 					type = SimElemType.Constraint,
 					makeSimElemType = typeof(SpringConstraint),
@@ -83,15 +86,17 @@ namespace UniVerlet2D.Lab {
 					header = "sc",
 
 					makeMethod = SimElemMakeMethod.ClickParticle,
+					detectedMarkerAttr = SimElemAttr.Particle,
 					needMakingElemNum = 2,
 					makeSimElemInfoType = typeof(SpringConstraintInfo),
 					markerID = SPRING_ID,
+					markerDepth = 1,
 				}
 			},
 			{
 				ANGLE_ID,
 				new SimElemProfile() {
-					id = ANGLE_ID,
+					profileID = ANGLE_ID,
 					attr = SimElemAttr.Angle,
 					type = SimElemType.Constraint,
 					makeSimElemType = typeof(AngleConstraint),
@@ -102,15 +107,17 @@ namespace UniVerlet2D.Lab {
 					header = "ac",
 
 					makeMethod = SimElemMakeMethod.ClickParticleInParticularOrder,
+					detectedMarkerAttr = SimElemAttr.Particle,
 					needMakingElemNum = 3,
 					makeSimElemInfoType = typeof(AngleConstraintInfo),
 					markerID = ANGLE_ID,
+					markerDepth = 2,
 				}
 			},
 			{
 				PIN_ID,
 				new SimElemProfile() {
-					id = PIN_ID,
+					profileID = PIN_ID,
 					attr = SimElemAttr.Particle,
 					type = SimElemType.Constraint,
 					makeSimElemType = typeof(PinConstraint),
@@ -121,9 +128,11 @@ namespace UniVerlet2D.Lab {
 					header = "pc",
 
 					makeMethod = SimElemMakeMethod.ClickParticle,
+					detectedMarkerAttr = SimElemAttr.Particle,
 					needMakingElemNum = 1,
 					makeSimElemInfoType = typeof(PinConstraintInfo),
-					markerID = PIN_ID
+					markerID = PIN_ID,
+					markerDepth = -1,
 				}
 			},
 		};
@@ -137,5 +146,21 @@ namespace UniVerlet2D.Lab {
 		public const string STRETCH_ID = "Stretch";
 		public const string HINGE_ID = "Hinge";
 		public const string JET_ID = "Jet";
+
+		public static SimElemProfile GetProfile(string profileID) {
+			if(!elemProfileDic.ContainsKey(profileID)) {
+				throw new System.Exception(string.Format("Not find {0} profile", profileID));
+			}
+			return elemProfileDic[profileID];
+		}
+
+		public static SimElemProfile GetProfileFromHeader(string header) {
+			foreach(var profile in elemProfileDic.Values) {
+				if(profile.header.Equals(header)) {
+					return profile;
+				}
+			}
+			return null;
+		}
 	}
 }

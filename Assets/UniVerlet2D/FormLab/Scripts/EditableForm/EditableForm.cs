@@ -9,24 +9,38 @@ namespace UniVerlet2D.Lab {
 
 	public class EditableForm {
 
+		/*
+		 * Inner class
+		 */
+
 		public class SimElemGroup {
 
-			public int loopGroupID;
-			public string type;
+			/*
+			 * Fields
+			 */
 
-			public bool useParticle;
-			public bool useSpring;
-			public bool useAngle;
-
+			SimElemDefine.SimElemProfile _profile;
 			List<SimElemInfo> _elements;
 
+			/*
+			 * Properties
+			 */
+
+			public SimElemDefine.SimElemProfile profile { get { return _profile; } }
 			public int numElems { get { return _elements.Count; } }
 
-			public SimElemGroup(int loopGroupID, string type) {
-				this.loopGroupID = loopGroupID;
-				this.type = type;
+			/*
+			 * Constructor
+			 */
+
+			public SimElemGroup(SimElemDefine.SimElemProfile profile) {
+				_profile = profile;
 				this._elements = new List<SimElemInfo>();
 			}
+
+			/*
+			 * Methods
+			 */
 
 			public void Add(SimElemInfo elem) {
 				_elements.Add(elem);
@@ -73,27 +87,51 @@ namespace UniVerlet2D.Lab {
 		Dictionary<int, SimElemGroup> _elemGroupDic;
 
 		/*
+		 * Constructor
+		 */
+
+		public EditableForm() {
+			_elemGroupDic = new Dictionary<int, SimElemGroup>();
+		}
+
+		/*
 		 * Element related
 		 */
 
-		public void AddGroup(int id, int loopGroupID, string type) {
+		public void AddGroup(SimElemDefine.SimElemProfile profile) {
+			int id = profile.tableID;
 			if(_elemGroupDic.ContainsKey(id)) {
 				return;
 			}
-			_elemGroupDic.Add(id, new SimElemGroup(loopGroupID, type));
+			_elemGroupDic.Add(id, new SimElemGroup(profile));
 		}
 
-		void AddElement(int id, SimElemInfo elem) {
+		public void AddElemInfo(SimElemInfo elemInfo) {
+			var profile = SimElemDefine.GetProfile(elemInfo.profileID);
 			SimElemGroup group;
-			if(_elemGroupDic.TryGetValue(id, out group)) {
-				group.Add(elem);
+			if(!_elemGroupDic.TryGetValue(profile.tableID, out group)) {
+				AddGroup(profile);
+				group = _elemGroupDic[profile.tableID];
 			}
+			group.Add(elemInfo);
 		}
 
 		public SimElemInfo GetByUID(int id, int uid) {
 			SimElemGroup group;
 			if(_elemGroupDic.TryGetValue(id, out group)) {
 				return group.GetByUID(uid);
+			}
+			return null;
+		}
+
+		public SimElemInfo GetByUID(int uid) {
+			foreach(var group in _elemGroupDic.Values) {
+				for(var i = 0; i < group.numElems; ++i) {
+					var elem = group.GetAt(i);
+					if(elem.uid == uid) {
+						return group.GetAt(i);
+					}
+				}
 			}
 			return null;
 		}
@@ -107,33 +145,30 @@ namespace UniVerlet2D.Lab {
 		}
 
 		/*
-		 *  functions
+		 * methods
 		 */
 
-		public List<SimElemInfo> SerializeSimeElements() {
-			Dictionary<int, List<SimElemInfo>> simElems = new Dictionary<int, List<SimElemInfo>>();
+		public void ClearAllElemGroup() {
+			_elemGroupDic.Clear();
+		}
 
-			foreach(int id in _elemGroupDic.Keys) {
-				if(!simElems.ContainsKey(id)) {
-					simElems.Add(id, new List<SimElemInfo>());
-				}
-			}
-
-			return null;
+		public List<int> GetSortedKeyList() {
+			List<int> keys = new List<int>(_elemGroupDic.Keys);
+			keys.Sort((x, y) => x < y ? -1 : (x > y ? 1 : 0));
+			return keys;
 		}
 
 		/*
 		 * Export and import
 		 */
 
-		public FormText ExportFormText() {
-
+		public string ExportFormattedText() {
 			StringBuilder sb = new StringBuilder();
-			string header;
+			string header = " ";
 
 			foreach(int id in _elemGroupDic.Keys) {
 				var group = _elemGroupDic[id];
-				header = Type2Header(group.type);
+				header = group.profile.header;
 
 				for(var i = 0; i < group.numElems; ++i) {
 					var e = group.GetAt(i);
@@ -142,18 +177,45 @@ namespace UniVerlet2D.Lab {
 				sb.AppendLine();
 			}
 
-			var formText = new FormText();
-			formText.text = sb.ToString();
-			return formText;
+			return sb.ToString();
 		}
 
-		string Type2Header(string type) {
-			switch(type) {
-			case "Particle":
-				return "p";
-			default:
-				return null;
+		public void ImportFormattedText(string text) {
+			if(string.IsNullOrEmpty(text)) {
+				return;
 			}
+
+			ClearAllElemGroup();
+
+			var lines = text.Split('\n');
+
+			for(var i = 0; i < lines.Length; ++i) {
+				var separate = lines[i].Split(' ');
+				if(separate.Length != 2) {
+					continue;
+				}
+
+				var profile = SimElemDefine.GetProfileFromHeader(separate[0]);
+				var info = JsonUtility.FromJson(separate[1], profile.makeSimElemInfoType) as SimElemInfo;
+				info.AfterImportJson(this);
+
+				AddElemInfo(info);
+			}
+		}
+
+		public List<SimElemInfo> ExportAlignedSimElemList() {
+			List<SimElemInfo> alignedSimElements = new List<SimElemInfo>();
+
+			List<int> sortedKeys = GetSortedKeyList();
+
+			for(int i = 0; i < sortedKeys.Count; ++i) {
+				var group = _elemGroupDic[sortedKeys[i]];
+				for(var j = 0; j < group.numElems; ++i) {
+					alignedSimElements.Add(group.GetAt(j));
+				}
+			}
+
+			return alignedSimElements;
 		}
 	}
 }

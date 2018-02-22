@@ -5,7 +5,7 @@ using UnityEngine;
 namespace UniVerlet2D.Lab {
 
 	[RequireComponent(typeof(SpriteRenderer))]
-	public class SpriteMarker : SimElemMarker {
+	public abstract class SpriteMarker : SimElemMarker {
 
 		public Color activeColor = Color.white;
 		public Color disactiveColor = Color.gray;

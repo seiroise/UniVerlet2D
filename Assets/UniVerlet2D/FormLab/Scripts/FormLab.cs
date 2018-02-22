@@ -48,6 +48,9 @@ namespace UniVerlet2D.Lab {
 		[Header("Guide")]
 		public ConnectionGuide connectionGuide;
 
+		[Header("Maker")]
+		public SimElemMaker elemMaker;
+
 		[SerializeField]
 		CommandStack _commandStack;
 
@@ -59,6 +62,10 @@ namespace UniVerlet2D.Lab {
 		bool _isDragging = false;
 		int _draggedIdx;
 		Particle _draggedParticle;
+
+		// editable form
+		EditableForm _editableForm;
+		string _formattedText;
 
 		/*
 		 * Properties
@@ -79,6 +86,8 @@ namespace UniVerlet2D.Lab {
 			_editModeDic.Add(EditMode.Particle, new ParticleEditModeOperator(this));
 			_editModeDic.Add(EditMode.Spring, new SpringEditModeOperator(this));
 			_editModeDic.Add(EditMode.Angle, new AngleEditModeOperator(this));
+
+			_editableForm = new EditableForm();
 		}
 
 		void Start() {
@@ -86,23 +95,16 @@ namespace UniVerlet2D.Lab {
 			SwitchModeTo(Mode.Stop);
 			SwitchEditModeTo(EditMode.Particle);
 
+			/*
 			if(markerManager) {
 				var form = treeFormBuilder.Build(Vector2.zero);
 				_monoSim.sim.ImportForm(form);
 				markerManager.MakeFromSim(_monoSim.sim);
 			}
-
+			*/
 			// テスト
 			// var formText = _monoSim.sim.ExportFormText();
 			// Debug.Log(formText.text);
-
-			string typeText = "UniVerlet2D.AngleConstraint";
-			AngleConstraint a = _monoSim.sim.MakeAngleByIdx(0, 1, 2, 1f);
-			string aJson = a.ExportJson();
-			Debug.Log(aJson);
-			SimElement elem = (SimElement)JsonUtility.FromJson(aJson, System.Type.GetType(typeText));
-			elem.AfterDeserializeFromJson(_monoSim.sim);
-			Debug.Log(elem.ExportJson());
 		}
 
 		void Update() {
@@ -157,7 +159,10 @@ namespace UniVerlet2D.Lab {
 			_monoSim.updateSim = true;
 			_simRenderer.updateMesh = true;
 
-			_simRelatedForm = _monoSim.sim.ExportRelatedForm();
+			_formattedText = _editableForm.ExportFormattedText();
+			Debug.Log(_formattedText);
+
+			// _simRelatedForm = _monoSim.sim.ExportRelatedForm();
 		}
 
 		void SwitchToStop() {
@@ -168,9 +173,11 @@ namespace UniVerlet2D.Lab {
 			_simRenderer.Clear();
 			_simRenderer.updateMesh = false;
 
-			_monoSim.sim.ImportRelatedForm(_simRelatedForm);
+			_editableForm.ImportFormattedText(_formattedText);
 
-			markerManager.MakeFromSim(_monoSim.sim);
+			// _monoSim.sim.ImportRelatedForm(_simRelatedForm);
+
+			// markerManager.MakeFromSim(_monoSim.sim);
 		}
 
 		public void SwitchEditModeTo(EditMode editMode) {
@@ -185,19 +192,20 @@ namespace UniVerlet2D.Lab {
 			if(_currentEditMode != null) {
 				_currentEditMode.EnterMode();
 			}
-			/*
-			switch(_editMode) {
-			case EditMode.Particle:
-				markerManager.Activate(MarkerManager.PARTICLE_ID);
-				break;
-			case EditMode.Spring:
-				markerManager.Activate(MarkerManager.SPRING_ID);
-				break;
-			case EditMode.Angle:
-				markerManager.Activate(MarkerManager.ANGLE_ID);
-				break;
+
+			if(elemMaker) {
+				switch(_editMode) {
+				case EditMode.Particle:
+					elemMaker.SetSimElemProfile(SimElemDefine.PARTICLE_ID);
+					break;
+				case EditMode.Spring:
+					elemMaker.SetSimElemProfile(SimElemDefine.SPRING_ID);
+					break;
+				case EditMode.Angle:
+					elemMaker.SetSimElemProfile(SimElemDefine.ANGLE_ID);
+					break;
+				}
 			}
-			*/
 		}
 
 		/*
@@ -291,18 +299,35 @@ namespace UniVerlet2D.Lab {
 		}
 
 		/*
+		 * Sim element callback
+		 */
+
+		public void OnMakeSimElemInfo(SimElemInfo simElemInfo) {
+			markerManager.MakeSimElemMarker(simElemInfo);
+			_editableForm.AddElemInfo(simElemInfo);
+		}
+
+		/*
 		 * Mouse input
 		 */
 
 		public void OnDownSpace(Vector3 pos) {
 			if(_currentEditMode != null && _mode == Mode.Stop) {
-				_currentEditMode.DownSpace(pos);
+				// _currentEditMode.DownSpace(pos);
+
+				if(elemMaker) {
+					elemMaker.OnDownSpace(pos);
+				}
 			}
 		}
 
 		public void OnDownMarker(SimElemMarker marker) {
 			if(_currentEditMode != null && _mode == Mode.Stop) {
-				_currentEditMode.DownMarker(marker);
+				// _currentEditMode.DownMarker(marker);
+
+				if(elemMaker) {
+					elemMaker.OnDownMarker(marker);
+				}
 			}
 		}
 	}

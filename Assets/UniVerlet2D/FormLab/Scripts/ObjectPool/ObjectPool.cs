@@ -49,7 +49,7 @@ namespace UniVerlet2D.Lab {
 			}
 
 			/// <summary>
-			/// オブジェクトの追加
+			/// オブジェクトの取得
 			/// </summary>
 			/// <returns>The object.</returns>
 			/// <param name="position">Position.</param>
@@ -66,6 +66,25 @@ namespace UniVerlet2D.Lab {
 				currentIndex = currentSize;
 				AddObjects(addNum);
 				return ActivateObj(pool[currentIndex], position); ;
+			}
+
+			/// <summary>
+			/// オブジェクトの取得
+			/// </summary>
+			/// <returns>The object.</returns>
+			public T GetObject() {
+				T obj;
+				for(int i = 0; i < currentSize; ++i) {
+					currentIndex = (currentIndex + 1) % currentSize;
+					obj = pool[currentIndex];
+					if(!obj.gameObject.activeInHierarchy) {
+						return ActivateObj(obj, new Vector3(0f, 0f, 0f));
+					}
+				}
+				//要素の追加
+				currentIndex = currentSize;
+				AddObjects(addNum);
+				return ActivateObj(pool[currentIndex], new Vector3(0f, 0f, 0f));
 			}
 
 			/// <summary>

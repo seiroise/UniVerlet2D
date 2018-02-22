@@ -535,7 +535,7 @@ namespace UniVerlet2D {
 			}
 
 			for(var i = 0; i < numOfStretchs; ++i) {
-				var s = GetStretchAt(i);
+				// var s = GetStretchAt(i);
 				// form.pins.Add(new Form.StretchInfo(uid2idx[s.a.uid], uid2idx[s.b.uid], s.power));
 			}
 			return form;

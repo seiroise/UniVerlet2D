@@ -18,6 +18,9 @@ namespace UniVerlet2D.Lab {
 		 * Fields
 		 */
 
+		[Header("Markers")]
+		public List<SimElemMarker> markerPrefs;
+
 		[Header("Particle")]
 		public SimElemMarker particleMarkerPref;
 		public float particleMarkerDepth = 0f;
@@ -40,6 +43,8 @@ namespace UniVerlet2D.Lab {
 
 		Dictionary<string, List<SimElemMarker>> _markerDic;
 
+		Dictionary<int, SimElemMarker> _instancingMarkerDic;
+
 		/*
 		 * Unity events
 		 */
@@ -48,10 +53,10 @@ namespace UniVerlet2D.Lab {
 			base.Awake();
 
 			_markerDic = new Dictionary<string, List<SimElemMarker>>();
-			RegistObject(PARTICLE_ID, particleMarkerPref);
-			RegistObject(SPRING_ID, springMarkerPref);
-			RegistObject(ANGLE_ID, angleMarkerPref);
-			RegistObject(PIN_ID, pinMarkerPref);
+			RegistObject(SimElemDefine.PARTICLE_ID, particleMarkerPref);
+			RegistObject(SimElemDefine.SPRING_ID, springMarkerPref);
+			RegistObject(SimElemDefine.ANGLE_ID, angleMarkerPref);
+			RegistObject(SimElemDefine.PIN_ID, pinMarkerPref);
 		}
 
 		/*
@@ -98,6 +103,21 @@ namespace UniVerlet2D.Lab {
 				markers[i].gameObject.SetActive(false);
 			}
 			markers.Clear();
+		}
+
+		/*
+		 * New marker manage
+		 */
+
+		SimElemMarker MakeMarker(string markerID) {
+			var marker = GetObject(markerID, Vector3.zero);
+			return marker;
+		}
+
+		public void MakeSimElemMarker(SimElemInfo simElemInfo) {
+			var profile = SimElemDefine.GetProfile(simElemInfo.profileID);
+			var marker = MakeMarker(profile.markerID);
+			marker.SetSimElemInfo(simElemInfo, profile.markerDepth);
 		}
 
 		/*
@@ -148,7 +168,7 @@ namespace UniVerlet2D.Lab {
 			Vector3 pos = a.m.pos;
 			pos.z = angleMarkerDepth;
 
-			var marker = (AngleMarker)MakeMarker(ANGLE_ID, a, pos);
+			var marker = (AngleConstraintMarker)MakeMarker(ANGLE_ID, a, pos);
 			marker.SetAngle(a);
 		}
 

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace UniVerlet2D.Lab {
 
 	[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(PolygonCollider2D))]
-	public class AngleMarker : SimElemMarker {
+	public class AngleConstraintMarker : SimElemMarker {
 
 		public Color activeColor = Color.white;
 		public Color disactiveColor = Color.gray;
@@ -85,6 +85,32 @@ namespace UniVerlet2D.Lab {
 		public override void Disactivate() {
 			SetMesh(_minAngle, _maxAngle, _radius, 10, disactiveColor);
 			_collider.enabled = false;
+		}
+
+		public override bool SetSimElemInfo(SimElemInfo info, float depth) {
+			base.SetSimElemInfo(info, depth);
+
+			var a = info as AngleConstraintInfo;
+			if(a == null) {
+				return false;
+			}
+
+			Vector3 pos = a.m.pos;
+			pos.z = depth;
+			transform.position = pos;
+
+			var aAngle = a.aAngle;
+			var bAngle = a.bAngle;
+			var aLen = (a.a.pos - a.m.pos).magnitude;
+			var bLen = (a.b.pos - a.m.pos).magnitude;
+
+			_minAngle = Mathf.Min(aAngle, bAngle);
+			_maxAngle = Mathf.Max(aAngle, bAngle);
+			_radius = Mathf.Max(minRadius, Mathf.Min(aLen, bLen) * 0.2f);
+
+			SetMesh(_minAngle, _maxAngle, _radius, 10, activeColor);
+
+			return true;
 		}
 	}
 }

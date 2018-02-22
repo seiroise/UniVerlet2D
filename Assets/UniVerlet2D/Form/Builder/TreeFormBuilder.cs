@@ -75,7 +75,7 @@ namespace UniVerlet2D.Data {
 			}
 
 			var p = _sim.MakeParticle(rootPosition);
-			var tp = MakeBranch(p, baseBranchLength + branchLength.random, 90f, maxDepth);
+			MakeBranch(p, baseBranchLength + branchLength.random, 90f, maxDepth);
 			return _sim.ExportForm();
 		}
 

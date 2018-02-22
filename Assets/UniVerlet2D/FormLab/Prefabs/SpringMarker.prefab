@@ -75,13 +75,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1937052831954472}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9174af3d047344298aa3b340fd1922b7, type: 3}
+  m_Script: {fileID: 11500000, guid: 30aac4b85d44544bd8ee7e5a832e8cca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _uid: 0
   _elemType: 
   activeColor: {r: 0.85294116, g: 0.7729152, b: 0.50800174, a: 1}
-  disactiveColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.7529412}
+  disactiveColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
 --- !u!212 &212602410985815010
 SpriteRenderer:
   m_ObjectHideFlags: 1
