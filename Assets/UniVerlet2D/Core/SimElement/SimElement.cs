@@ -31,7 +31,7 @@ namespace UniVerlet2D {
 		 * Abstract methods
 		 */
 
-		public virtual void Step(float dt) { }
+		public abstract void Step(float dt);
 
 		public abstract Matrix4x4 GetMatrix();
 	}

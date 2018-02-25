@@ -12,7 +12,7 @@ namespace UniVerlet2D.Lab {
 		}
 
 		public enum EditMode {
-			None, Particle, Spring, Angle
+			None, Particle, Spring, Angle, Jet
 		}
 
 		public enum EditMethod {
@@ -67,10 +67,12 @@ namespace UniVerlet2D.Lab {
 
 		// editable form
 		EditableForm _editableForm;
+		AlignedEditableForm _alignedEditableForm;
 		string _formattedText;
 
-		VerletIntegrator _integrator;
+		SimpleSim _simulator;
 		public IntegratorRenderer integratorRenderer;
+		List<Particle> _particles;
 
 		/*
 		 * Properties
@@ -94,8 +96,8 @@ namespace UniVerlet2D.Lab {
 
 			_editableForm = new EditableForm();
 
-			_integrator = new VerletIntegrator();
-			_integrator.Init();
+			_simulator = new SimpleSim();
+			_simulator.Init();
 		}
 
 		void Start() {
@@ -120,10 +122,10 @@ namespace UniVerlet2D.Lab {
 				if(!_isDragging) {
 					if(Input.GetMouseButtonDown(0)) {
 						int idx;
-						if(_monoSim.sim.GetOverlapParticle(markerDetector.wmPos, 0.5f, out idx)) {
+						if(SimpleSimHelper.GetOverlapParticleIdx(_particles, markerDetector.wmPos, 0.5f, out idx)) {
 							_isDragging = true;
 							_draggedIdx = idx;
-							_draggedParticle = _monoSim.sim.GetParticleAt(idx);
+							_draggedParticle = _particles[idx];
 						}
 					}
 				} else {
@@ -140,7 +142,8 @@ namespace UniVerlet2D.Lab {
 			}
 
 			if(_mode == Mode.Play) {
-				integratorRenderer.SetMesh(_integrator);
+				_simulator.Update(Time.deltaTime);
+				integratorRenderer.SetMesh(_simulator);
 			}
 		}
 
@@ -173,8 +176,15 @@ namespace UniVerlet2D.Lab {
 
 			// テスト
 			var aef = _editableForm.ExportAlignedEditableForm();
-			_integrator.ImportFromSimElementList(aef.ExportSimElements());
-			integratorRenderer.renderedSimElemIdx = aef.renderedSimElemIdx;
+			_simulator.ImportFromSimElementList(aef.ExportSimElements());
+			integratorRenderer.renderedSimElemIdx = aef.renderedSimElemIdxs;
+
+			_particles = SimpleSimHelper.GetParticlesByIdx(aef.particleIdxs, _simulator);
+
+			_alignedEditableForm = aef;
+
+			_simInteraction.ConnectUID2IDX(aef);
+			_simInteraction.SetSimulator(_simulator);
 
 			// _simRelatedForm = _monoSim.sim.ExportRelatedForm();
 		}
@@ -199,14 +209,17 @@ namespace UniVerlet2D.Lab {
 				return;
 			}
 			_editMode = editMode;
+			/*
 			if(_currentEditMode != null) {
 				_currentEditMode.ExitMode();
 			}
-			_currentEditMode = _editModeDic[editMode];
+			*/
+			// _currentEditMode = _editModeDic[editMode];
+			/*
 			if(_currentEditMode != null) {
 				_currentEditMode.EnterMode();
 			}
-
+			*/
 			if(elemMaker) {
 				switch(_editMode) {
 				case EditMode.Particle:
@@ -217,6 +230,9 @@ namespace UniVerlet2D.Lab {
 					break;
 				case EditMode.Angle:
 					elemMaker.SetSimElemProfile(SimElemDefine.ANGLE_ID);
+					break;
+				case EditMode.Jet:
+					elemMaker.SetSimElemProfile(SimElemDefine.JET_ID);
 					break;
 				}
 			}
@@ -292,6 +308,12 @@ namespace UniVerlet2D.Lab {
 			}
 		}
 
+		public void OnChangeToJet(bool v) {
+			if(v) {
+				SwitchEditModeTo(EditMode.Jet);
+			}
+		}
+
 		public void OnChangeToMake(bool v) {
 			if(v) {
 				_editMethod = EditMethod.Make;
@@ -319,6 +341,11 @@ namespace UniVerlet2D.Lab {
 		public void OnMakeSimElemInfo(SimElemInfo simElemInfo) {
 			markerManager.MakeSimElemMarker(simElemInfo);
 			_editableForm.AddElemInfo(simElemInfo);
+
+			if(_editMode == EditMode.Jet) {
+				Debug.Log("Add Jet");
+				_simInteraction.AddInteractionUID("Space", simElemInfo.uid);
+			}
 		}
 
 		/*
@@ -326,7 +353,7 @@ namespace UniVerlet2D.Lab {
 		 */
 
 		public void OnDownSpace(Vector3 pos) {
-			if(_currentEditMode != null && _mode == Mode.Stop) {
+			if(/*_currentEditMode != null && */_mode == Mode.Stop) {
 				// _currentEditMode.DownSpace(pos);
 
 				if(elemMaker) {
@@ -336,7 +363,7 @@ namespace UniVerlet2D.Lab {
 		}
 
 		public void OnDownMarker(SimElemMarker marker) {
-			if(_currentEditMode != null && _mode == Mode.Stop) {
+			if(/*_currentEditMode != null && */_mode == Mode.Stop) {
 				// _currentEditMode.DownMarker(marker);
 
 				if(elemMaker) {

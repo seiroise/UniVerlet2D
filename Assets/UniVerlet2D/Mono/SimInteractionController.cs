@@ -1,16 +1,25 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UniVerlet2D.Lab;
 
 namespace UniVerlet2D {
 
-	[RequireComponent(typeof(IFormLayer))]
 	public class SimInteractionController : MonoBehaviour {
 
 		[System.Serializable]
 		public class InteractionGroup {
 			public string triggerName;
+			public List<int> interactionUID;
+
 			public List<int> interactionIdx;
+
+			public InteractionGroup(string triggerName) {
+				this.triggerName = triggerName;
+				interactionUID = new List<int>();
+
+				interactionIdx = new List<int>();
+			}
 		}
 
 		/*
@@ -18,17 +27,15 @@ namespace UniVerlet2D {
 		 */
 
 		public KeyInputMap inputMap;
+		public SimpleSim _sim;
 
 		Dictionary<string, InteractionGroup> _interactionGroupDic;
-
-		Simulator _sim;
 
 		/*
 		 * Unity events
 		 */
 
 		void Awake() {
-			_sim = GetComponent<IFormLayer>().sim;
 			_interactionGroupDic = new Dictionary<string, InteractionGroup>();
 		}
 
@@ -43,9 +50,10 @@ namespace UniVerlet2D {
 		public void OnDetectDown(string message) {
 			InteractionGroup iGroup;
 			if(_interactionGroupDic.TryGetValue(message, out iGroup)) {
-				for(var i = 0; i < iGroup.interactionIdx.Count; ++i) {
-					// var interaction = _sim.GetInteractionAt(iGroup.interactionIdx[i]);
-					// interaction.TurnOn();
+				Debug.Log(message);
+				for(int i = 0; i < iGroup.interactionIdx.Count; ++i) {
+					var interaction = _sim.GetSimElementAt(iGroup.interactionIdx[i]) as Interaction;
+					interaction.TurnOn();
 				}
 			}
 		}
@@ -53,9 +61,9 @@ namespace UniVerlet2D {
 		public void OnDetectUp(string message) {
 			InteractionGroup iGroup;
 			if(_interactionGroupDic.TryGetValue(message, out iGroup)) {
-				for(var i = 0; i < iGroup.interactionIdx.Count; ++i) {
-					// var interaction = _sim.GetInteractionAt(iGroup.interactionIdx[i]);
-					// interaction.TurnOff();
+				for(int i = 0; i < iGroup.interactionIdx.Count; ++i) {
+					var interaction = _sim.GetSimElementAt(iGroup.interactionIdx[i]) as Interaction;
+					interaction.TurnOff();
 				}
 			}
 		}
@@ -64,11 +72,25 @@ namespace UniVerlet2D {
 		 * Methods
 		 */
 
-		public void AddInteraction(string triggerName, int idx) {
+		public void AddInteractionUID(string triggerName, int uid) {
 			InteractionGroup group;
-			if(_interactionGroupDic.TryGetValue(triggerName, out group)) {
-				group.interactionIdx.Add(idx);
+			if(!_interactionGroupDic.TryGetValue(triggerName, out group)) {
+				group = new InteractionGroup(triggerName);
+				_interactionGroupDic.Add(triggerName, group);
 			}
+			group.interactionUID.Add(uid);
+		}
+
+		public void ConnectUID2IDX(AlignedEditableForm aef) {
+			foreach(var group in _interactionGroupDic.Values) {
+				for(var i = 0; i < group.interactionUID.Count; ++i) {
+					group.interactionIdx.Add(aef.uid2idxDic[group.interactionUID[i]]);
+				}
+			}
+		}
+
+		public void SetSimulator(SimpleSim sim) {
+			_sim = sim;
 		}
 	}
 }

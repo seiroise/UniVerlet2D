@@ -6,6 +6,12 @@ namespace UniVerlet2D.Lab {
 
 	public class MarkerManager : ObjectPool<SimElemMarker> {
 
+		[System.Serializable]
+		public class NameMarkerPair {
+			public string name;
+			public SimElemMarker marker;
+		}
+
 		public const string PARTICLE_ID = "Particle";
 
 		public const string SPRING_ID = "Spring";
@@ -57,6 +63,8 @@ namespace UniVerlet2D.Lab {
 			RegistObject(SimElemDefine.SPRING_ID, springMarkerPref);
 			RegistObject(SimElemDefine.ANGLE_ID, angleMarkerPref);
 			RegistObject(SimElemDefine.PIN_ID, pinMarkerPref);
+
+			// RegistObject(SimElemDefine.JET_ID, markerPrefs[0]);
 		}
 
 		/*

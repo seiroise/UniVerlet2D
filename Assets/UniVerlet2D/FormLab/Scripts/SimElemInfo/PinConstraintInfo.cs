@@ -57,5 +57,9 @@ namespace UniVerlet2D.Lab {
 		public override void AfterImportJson(EditableForm form) {
 			form.GetByUID(_aUID);
 		}
+
+		public override bool ContainsUID(int uid) {
+			return _a.uid == uid;
+		}
 	}
 }

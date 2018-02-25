@@ -65,5 +65,9 @@ namespace UniVerlet2D.Lab {
 			_a = form.GetByUID(_aUID) as ParticleInfo;
 			_b = form.GetByUID(_bUID) as ParticleInfo;
 		}
+
+		public override bool ContainsUID(int uid) {
+			return _a.uid == uid || _b.uid == uid;
+		}
 	}
 }

@@ -127,8 +127,8 @@ namespace UniVerlet2D.Lab {
 		public SimElemInfo GetByUID(int uid) {
 			foreach(var group in _elemGroupDic.Values) {
 				for(var i = 0; i < group.numElems; ++i) {
-					var elem = group.GetAt(i);
-					if(elem.uid == uid) {
+					var elemInfo = group.GetAt(i);
+					if(elemInfo.uid == uid) {
 						return group.GetAt(i);
 					}
 				}
@@ -142,6 +142,42 @@ namespace UniVerlet2D.Lab {
 				return group.GetAt(idx);
 			}
 			return null;
+		}
+
+		public bool TryGetIdxByUID(int uid, out int id, out int idx) {
+			id = idx = -1;
+			foreach(var group in _elemGroupDic.Values) {
+				for(var i = 0; i < group.numElems; ++i) {
+					var elemInfo = group.GetAt(i);
+					if(elemInfo.uid == uid) {
+						id = group.profile.tableID;
+						idx = i;
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
+		public void RemoveByUID(int uid) {
+			int id, idx;
+			List<int> relatedUIDs = new List<int>();
+			if(TryGetIdxByUID(uid, out id, out idx)) {
+				var elemInfo = _elemGroupDic[id].GetAt(idx);
+			}
+		}
+
+		public List<SimElemInfo> GetElemInfoContainingUID(int uid) {
+			List<SimElemInfo> simElemInfos = new List<SimElemInfo>();
+			foreach(var group in _elemGroupDic.Values) {
+				for(var i = 0; i < group.numElems; ++i) {
+					var elemInfo = group.GetAt(i);
+					if(elemInfo.ContainsUID(uid)) {
+						simElemInfos.Add(elemInfo);
+					}
+				}
+			}
+			return simElemInfos;
 		}
 
 		/*
@@ -209,16 +245,23 @@ namespace UniVerlet2D.Lab {
 			List<int> sortedKeys = GetSortedKeyList();
 			Dictionary<int, int> uid2idxDic = new Dictionary<int, int>();
 
-			List<int> renderedSimElemIdx = new List<int>();
+			// その他の要素を参照するためのインデックス
+			List<int> particleIdxs = new List<int>();
+			List<int> renderedSimElemIdxs = new List<int>();
 
-			bool canRender;
+			bool canRender, isParticle;
 
 			for(int i = 0; i < sortedKeys.Count; ++i) {
 				var group = _elemGroupDic[sortedKeys[i]];
+				isParticle = (group.profile.attr == SimElemDefine.SimElemAttr.Particle);
 				canRender = group.profile.canRender;
+
 				for(var j = 0; j < group.numElems; ++j) {
 					if(canRender) {
-						renderedSimElemIdx.Add(alignedSimElemInfo.Count);
+						renderedSimElemIdxs.Add(alignedSimElemInfo.Count);
+					}
+					if(isParticle) {
+						particleIdxs.Add(alignedSimElemInfo.Count);
 					}
 					var elemInfo = group.GetAt(j);
 					uid2idxDic.Add(elemInfo.uid, alignedSimElemInfo.Count);
@@ -229,7 +272,9 @@ namespace UniVerlet2D.Lab {
 			var exportForm = new AlignedEditableForm();
 			exportForm.simElemInfos = alignedSimElemInfo;
 			exportForm.uid2idxDic = uid2idxDic;
-			exportForm.renderedSimElemIdx = renderedSimElemIdx;
+
+			exportForm.renderedSimElemIdxs = renderedSimElemIdxs;
+			exportForm.particleIdxs = particleIdxs;
 
 			return exportForm;
 		}

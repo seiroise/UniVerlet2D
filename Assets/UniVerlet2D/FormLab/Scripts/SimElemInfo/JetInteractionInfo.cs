@@ -4,64 +4,46 @@ using UnityEngine;
 
 namespace UniVerlet2D.Lab {
 
-	public class AngleConstraintInfo : SimElemInfo {
+	public class JetInteractionInfo : SimElemInfo {
 
 		/*
 		 * Fields
 		 */
 
-		ParticleInfo _a, _b, _m;
+		ParticleInfo _a, _b;
 
 		[SerializeField]
-		float _stiffness;
-
+		float _power;
 		[SerializeField]
-		int _aUID, _bUID, _mUID;
-
-		/*
-		 * Properties
-		 */
+		int _aUID, _bUID;
 
 		public ParticleInfo a { get { return _a; } }
 		public ParticleInfo b { get { return _b; } }
-		public ParticleInfo m { get { return _m; } }
-
-		public float aAngle { get { var d = _a.pos - _m.pos; return Mathf.Atan2(d.y, d.x); } }
-		public float bAngle { get { var d = _b.pos - _m.pos; return Mathf.Atan2(d.y, d.x); } }
-
-		public float stiffness { get { return _stiffness; } set { _stiffness = value; } }
-
-		/*
-		 * Methods
-		 */
 
 		public override SimElement MakeSimElement(AlignedEditableForm aef, List<SimElement> simElements) {
 			var a = simElements[aef.uid2idxDic[_aUID]] as Particle;
 			var b = simElements[aef.uid2idxDic[_bUID]] as Particle;
-			var m = simElements[aef.uid2idxDic[_mUID]] as Particle;
 
-			var ac = new AngleConstraint(a, b, m, _stiffness);
-			ac.OverrideUID(uid);
+			var jc = new JetInteraction(a, b, _power);
+			jc.OverrideUID(uid);
 
-			return ac;
+			return jc;
 		}
 
 		public override bool SetParams(int uid, string profileID, object[] args) {
 			base.SetParams(uid, profileID, args);
 
-			if(args.Length != 3) {
+			if(args.Length != 2) {
 				return false;
 			}
 
 			_a = args[0] as ParticleInfo;
-			_b = args[2] as ParticleInfo;
-			_m = args[1] as ParticleInfo;
+			_b = args[1] as ParticleInfo;
 
 			_aUID = _a.uid;
 			_bUID = _b.uid;
-			_mUID = _m.uid;
 
-			_stiffness = 1f;
+			_power = 1f;
 
 			return true;
 		}
@@ -69,11 +51,10 @@ namespace UniVerlet2D.Lab {
 		public override void AfterImportJson(EditableForm form) {
 			_a = form.GetByUID(_aUID) as ParticleInfo;
 			_b = form.GetByUID(_bUID) as ParticleInfo;
-			_m = form.GetByUID(_mUID) as ParticleInfo;
 		}
 
 		public override bool ContainsUID(int uid) {
-			return _a.uid == uid || _b.uid == uid || _m.uid == uid;
+			return _a.uid == uid || _b.uid == uid;
 		}
 	}
 }

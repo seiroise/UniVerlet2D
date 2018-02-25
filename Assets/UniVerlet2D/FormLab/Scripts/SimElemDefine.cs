@@ -149,6 +149,29 @@ namespace UniVerlet2D.Lab {
 					canRender = false,
 				}
 			},
+			{
+				JET_ID,
+				new SimElemProfile() {
+					profileID = JET_ID,
+					attr = SimElemAttr.Particle,
+					type = SimElemType.Interaction,
+					makeSimElemType = typeof(JetInteraction),
+
+					tableID = 4,
+					loopGroupID = 5,
+
+					header = "ji",
+
+					makeMethod = SimElemMakeMethod.ClickParticle,
+					detectedMarkerAttr = SimElemAttr.Particle,
+					needMakingElemNum = 2,
+					makeSimElemInfoType = typeof(JetInteractionInfo),
+					markerID = JET_ID,
+					markerDepth = -0.5f,
+
+					canRender = false,
+				}
+			}
 		};
 
 		public const string PARTICLE_ID = "Particle";
@@ -157,13 +180,13 @@ namespace UniVerlet2D.Lab {
 		public const string ANGLE_ID = "Angle";
 		public const string PIN_ID = "Pin";
 
+		public const string JET_ID = "Jet";
 		public const string STRETCH_ID = "Stretch";
 		public const string HINGE_ID = "Hinge";
-		public const string JET_ID = "Jet";
 
 		public static SimElemProfile GetProfile(string profileID) {
 			if(!elemProfileDic.ContainsKey(profileID)) {
-				throw new System.Exception(string.Format("Not find {0} profile", profileID));
+				throw new System.Exception(string.Format("Not find profile of {0}.", profileID));
 			}
 			return elemProfileDic[profileID];
 		}
@@ -174,7 +197,12 @@ namespace UniVerlet2D.Lab {
 					return profile;
 				}
 			}
-			return null;
+
+			throw new System.Exception(string.Format("Not find profile from header[{0}].", header));
+		}
+
+		public static void AddProfile(SimElemProfile profile) {
+			
 		}
 	}
 }

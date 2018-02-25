@@ -26,6 +26,10 @@ namespace UniVerlet2D.Lab {
 		 * Methods
 		 */
 
+		public string ExportJson() {
+			return JsonUtility.ToJson(this);
+		}
+
 		public virtual bool SetParams(int uid, string profileID, object[] args) {
 			_uid = uid;
 			_profileID = profileID;
@@ -36,8 +40,6 @@ namespace UniVerlet2D.Lab {
 
 		public abstract void AfterImportJson(EditableForm form);
 
-		public string ExportJson() {
-			return JsonUtility.ToJson(this);
-		}
+		public abstract bool ContainsUID(int uid);
 	}
 }

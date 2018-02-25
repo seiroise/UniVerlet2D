@@ -5,9 +5,12 @@ using UnityEngine;
 namespace UniVerlet2D.Lab {
 
 	public class AlignedEditableForm {
+		
 		public List<SimElemInfo> simElemInfos;
 		public Dictionary<int, int> uid2idxDic;
-		public List<int> renderedSimElemIdx;
+
+		public List<int> renderedSimElemIdxs;
+		public List<int> particleIdxs;
 
 		public List<SimElement> ExportSimElements() {
 			List<SimElement> simElements = new List<SimElement>();
