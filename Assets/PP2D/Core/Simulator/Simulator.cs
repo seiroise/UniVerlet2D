@@ -1,26 +1,38 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace PP2D {
 
+	[System.Serializable]
 	public class Simulator {
+
+		[System.Serializable]
+		public class ChangeCompositionEvent : UnityEvent { }
 
 		/*
 		 * Fields
 		 */
 
 		List<SimElement> _simElements;
-
-		public Simulator() {
-			Clear();
-		}
+		[SerializeField]
+		ChangeCompositionEvent _onChangeComposition;
 
 		/*
 		 * Properties
 		 */
 
 		public int numElements { get { return _simElements.Count; } }
+		public ChangeCompositionEvent onChangeComposition { get { return _onChangeComposition != null ? _onChangeComposition : _onChangeComposition = new ChangeCompositionEvent(); } }
+
+		/*
+		 * Constructor
+		 */
+
+		public Simulator() {
+			Clear();
+		}
 
 		/*
 		 * Methods
@@ -55,6 +67,9 @@ namespace PP2D {
 
 		public void AddSimElement(SimElement simElem) {
 			_simElements.Add(simElem);
+			if(_onChangeComposition != null) {
+				_onChangeComposition.Invoke();
+			}
 		}
 
 		public SimElement GetSimElementAt(int idx) {
@@ -67,7 +82,14 @@ namespace PP2D {
 		public void RemoveSimElementAt(int idx) {
 			if(IsRangeInside(idx)) {
 				_simElements.RemoveAt(idx);
+				if(_onChangeComposition != null) {
+					_onChangeComposition.Invoke();
+				}
 			}
+		}
+
+		public List<T> FindSimElems<T>() where T : SimElement {
+			return SimElementHelper.FindSimElems<T>(_simElements);
 		}
 
 		/*

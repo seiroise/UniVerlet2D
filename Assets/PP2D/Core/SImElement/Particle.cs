@@ -19,6 +19,7 @@ namespace PP2D {
 
 		public Particle(Vector2 pos, float damping = 0.9f) {
 			this._oldPos = this._pos = pos;
+			_damping = damping;
 		}
 
 		public override void Step(float dt) {

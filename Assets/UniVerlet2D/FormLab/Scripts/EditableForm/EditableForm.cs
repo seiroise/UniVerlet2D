@@ -161,7 +161,7 @@ namespace UniVerlet2D.Lab {
 
 		public void RemoveByUID(int uid) {
 			int id, idx;
-			List<int> relatedUIDs = new List<int>();
+			// List<int> relatedUIDs = new List<int>();
 			if(TryGetIdxByUID(uid, out id, out idx)) {
 				var elemInfo = _elemGroupDic[id].GetAt(idx);
 			}

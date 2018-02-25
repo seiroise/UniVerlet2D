@@ -6,6 +6,7 @@ namespace PP2D {
 
 	public class MonoSimulator : MonoBehaviour, ISimHolder {
 
+		[SerializeField]
 		Simulator _sim;
 
 		public Simulator simulator { get { return _sim; } }

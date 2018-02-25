@@ -17,6 +17,7 @@ namespace PP2D {
 		 * Properties
 		 */
 
+		public string name { get { return this.GetType().Name; } }
 		public int uid { get { return _uid; } }
 
 		/*

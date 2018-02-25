@@ -123,7 +123,7 @@ GameObject:
   - component: {fileID: 1153674962}
   - component: {fileID: 1153674963}
   m_Layer: 0
-  m_Name: Spinal
+  m_Name: Cloth
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -153,7 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1124ced35b93940c68af63b2f0b5e71e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _renderingSettings: {fileID: 11400000, guid: 153a50b08e0c44548a748af5ea76ff9d, type: 2}
+  _renderingSettings: {fileID: 11400000, guid: 6c3253c56b2654d1fbec968e69c9c64a, type: 2}
   _renderingGroups: []
 --- !u!33 &1153674959
 MeshFilter:
@@ -219,11 +219,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 1153674956}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6282a28ad1dc745e899d6422a6d09cfe, type: 3}
+  m_Script: {fileID: 11500000, guid: 12da91b37692d4e7bac4de292969fe1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  length: 10
-  boneNum: 10
+  row: 20
+  col: 20
+  rowSize: 5
+  colSize: 5
+  particleDamping: 0.975
+  springStiffness: 15
+  gravity: {x: 0, y: -0.98}
 --- !u!114 &1153674963
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -235,6 +240,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f04fd88a76d0442cbfa5f8eea7f6816, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _particleRadius: 0.2
 --- !u!1 &1885237452
 GameObject:
   m_ObjectHideFlags: 0

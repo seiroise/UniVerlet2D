@@ -62,27 +62,18 @@ namespace PP2D {
 
 		void TriangulateSimElements() {
 			_builder.Clear();
-
-			var invMat = transform.worldToLocalMatrix;
-
 			for(var i = 0; i < _renderingGroups.Count; ++i) {
 				var group = _renderingGroups[i];
 				var groupSettings = _renderingSettings.GetGroupSettingsAt(group.groupID);
 				for(var j = 0; j < group.indices.Count; ++j) {
 					var elem = _sim.GetSimElementAt(group.indices[j]);
-					var mat = invMat * elem.GetMatrix();
+					var mat = elem.GetMatrix();
 
 					_builder.AddQuad(
 						mat.MultiplyPoint3x4(groupSettings.positions[0]),
 						mat.MultiplyPoint3x4(groupSettings.positions[1]),
 						mat.MultiplyPoint3x4(groupSettings.positions[2]),
 						mat.MultiplyPoint3x4(groupSettings.positions[3])
-						/*
-						mat * groupSettings.positions[0],
-						mat * groupSettings.positions[1],
-						mat * groupSettings.positions[2],
-						mat * groupSettings.positions[3]
-						*/
 					);
 
 					_builder.AddQuadUV(
