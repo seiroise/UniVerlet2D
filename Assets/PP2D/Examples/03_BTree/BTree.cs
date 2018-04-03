@@ -52,19 +52,19 @@ namespace PP2D.Examples {
 			leafSpringIndices = new List<int>();
 
 			Particle root = new Particle(Vector2.zero, particleDamping);
-			branchParticleIndices.Add(composite.simElements.Count);
-			composite.simElements.Add(root);
+			branchParticleIndices.Add(composite.elemNum);
+			composite.AddSimElement(root);
 			PinConstraint rootPin = new PinConstraint(root);
 
 			Particle branch = MakeBranch(root, depth, branchLength, Mathf.PI * 0.5f, angleStiffness);
 			PinConstraint branchPin = new PinConstraint(branch);
 
-			composite.simElements.Add(rootPin);
-			composite.simElements.Add(branchPin);
+			composite.AddSimElement(rootPin);
+			composite.AddSimElement(branchPin);
 
-			composite.renderingGroups.Add(new SimRenderer.SimRenderingGroup(2, springIndices));
-			composite.renderingGroups.Add(new SimRenderer.SimRenderingGroup(0, branchParticleIndices));
-			composite.renderingGroups.Add(new SimRenderer.SimRenderingGroup(1, leafSpringIndices));
+			composite.AddRenderingGroup(new SimRenderer.SimRenderingGroup(2, springIndices));
+			composite.AddRenderingGroup(new SimRenderer.SimRenderingGroup(0, branchParticleIndices));
+			composite.AddRenderingGroup(new SimRenderer.SimRenderingGroup(1, leafSpringIndices));
 
 			return composite;
 		}
@@ -72,29 +72,29 @@ namespace PP2D.Examples {
 		Particle MakeBranch(Particle baseParticle, int depth, float branchLength, float angle, float angleStiffness) {
 			Particle p = new Particle(baseParticle.pos + AngleToVector2(angle) * branchLength);
 			if(depth > 0) {
-				branchParticleIndices.Add(composite.simElements.Count);
+				branchParticleIndices.Add(composite.elemNum);
 			}
-			composite.simElements.Add(p);
+			composite.AddSimElement(p);
 
 			SpringConstraint s = new SpringConstraint(baseParticle, p, springStiffness);
 			if(depth > 0) {
-				springIndices.Add(composite.simElements.Count);
+				springIndices.Add(composite.elemNum);
 			} else {
-				leafSpringIndices.Add(composite.simElements.Count);
+				leafSpringIndices.Add(composite.elemNum);
 			}
-			composite.simElements.Add(s);
+			composite.AddSimElement(s);
 
 			if(depth > 0) {
 				Particle lp = MakeBranch(p, depth - 1, branchLength, angle + Mathf.PI * 0.1f, angleStiffness * angleSoftness);
 				AngleConstraint lac = new AngleConstraint(baseParticle, lp, p, angleStiffness);
-				composite.simElements.Add(lac);
+				composite.AddSimElement(lac);
 
 				Particle rp = MakeBranch(p, depth - 1, branchLength, angle - Mathf.PI * 0.1f, angleStiffness * angleSoftness);
 				AngleConstraint rac = new AngleConstraint(baseParticle, rp, p, angleStiffness);
-				composite.simElements.Add(rac);
+				composite.AddSimElement(rac);
 
 				AngleConstraint cac = new AngleConstraint(lp, rp, p, angleStiffness);
-				composite.simElements.Add(cac);
+				composite.AddSimElement(cac);
 			}
 			return p;
 		}

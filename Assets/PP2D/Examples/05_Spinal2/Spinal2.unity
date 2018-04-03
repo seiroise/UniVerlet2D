@@ -1252,7 +1252,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   particleRadius: 0.5
-  particleForceFeedback: 0.5
+  particleForceFeedback: 1
   targetForceFeedback: 0
   onCollisionEnter:
     m_PersistentCalls:

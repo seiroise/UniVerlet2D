@@ -13,15 +13,15 @@ namespace PP2D.Plantae {
 		public override Composite MakeComposite() {
 			Composite composite = new Composite();
 
-			composite.renderingGroups.Add(new SimRenderer.SimRenderingGroup(2, new List<int>()));
-			composite.renderingGroups.Add(new SimRenderer.SimRenderingGroup(0, new List<int>()));
-			composite.renderingGroups.Add(new SimRenderer.SimRenderingGroup(1, new List<int>()));
+			composite.AddRenderingGroup(new SimRenderer.SimRenderingGroup(2, new List<int>()));
+			composite.AddRenderingGroup(new SimRenderer.SimRenderingGroup(0, new List<int>()));
+			composite.AddRenderingGroup(new SimRenderer.SimRenderingGroup(1, new List<int>()));
 
 			Particle root = new Particle(Vector2.zero, particleDamping);
-			composite.renderingGroups[1].indices.Add(composite.simElements.Count);
-			composite.simElements.Add(new PinConstraint(root));
+			// composite.renderingGroups[1].indices.Add(composite.elemNum);
+			composite.AddSimElement(new PinConstraint(root));
 			Particle next = MakeLimb(composite, root, 1f, Mathf.PI * 0.5f);
-			composite.simElements.Add(new PinConstraint(next));
+			composite.AddSimElement(new PinConstraint(next));
 
 			return composite;
 		}

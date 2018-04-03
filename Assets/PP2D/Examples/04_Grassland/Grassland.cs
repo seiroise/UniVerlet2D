@@ -37,17 +37,17 @@ namespace PP2D.Examples {
 				MakePlant(Vector2.Lerp(start, end, Mathf.InverseLerp(0, seeds, i)), jointsRange.randomInt, Mathf.PI * 0.5f);
 			}
 
-			composite.renderingGroups.Add(new SimRenderer.SimRenderingGroup(2, branchSpringIndices));
-			composite.renderingGroups.Add(new SimRenderer.SimRenderingGroup(0, particleIndices));
-			composite.renderingGroups.Add(new SimRenderer.SimRenderingGroup(1, leafSpringIndices));
+			composite.AddRenderingGroup(new SimRenderer.SimRenderingGroup(2, branchSpringIndices));
+			composite.AddRenderingGroup(new SimRenderer.SimRenderingGroup(0, particleIndices));
+			composite.AddRenderingGroup(new SimRenderer.SimRenderingGroup(1, leafSpringIndices));
 
 			return composite;
 		}
 
 		void MakePlant(Vector2 basePosition, int joints, float baseAngle) {
 			Particle root = new Particle(basePosition);
-			particleIndices.Add(composite.simElements.Count);
-			composite.simElements.Add(root);
+			particleIndices.Add(composite.elemNum);
+			composite.AddSimElement(root);
 
 			Particle prev = root;
 			Particle prev2 = root;
@@ -58,22 +58,22 @@ namespace PP2D.Examples {
 				angle += angleRange.random * Mathf.Deg2Rad;
 				if(i == joints) {
 					Particle leaf = new Particle(prev.pos + AngleToVector2(angle) * branchLengthRange.random);
-					particleIndices.Add(composite.simElements.Count);
-					composite.simElements.Add(leaf);
+					particleIndices.Add(composite.elemNum);
+					composite.AddSimElement(leaf);
 
 					SpringConstraint leafSpring = new SpringConstraint(prev, leaf, springStiffness);
-					leafSpringIndices.Add(composite.simElements.Count);
-					composite.simElements.Add(leafSpring);
+					leafSpringIndices.Add(composite.elemNum);
+					composite.AddSimElement(leafSpring);
 
 					current = leaf;
 				} else {
 					Particle joint = new Particle(prev.pos + AngleToVector2(angle) * branchLengthRange.random);
-					particleIndices.Add(composite.simElements.Count);
-					composite.simElements.Add(joint);
+					particleIndices.Add(composite.elemNum);
+					composite.AddSimElement(joint);
 
 					SpringConstraint spring = new SpringConstraint(prev, joint, springStiffness);
-					branchSpringIndices.Add(composite.simElements.Count);
-					composite.simElements.Add(spring);
+					branchSpringIndices.Add(composite.elemNum);
+					composite.AddSimElement(spring);
 
 					current = joint;
 
@@ -83,16 +83,16 @@ namespace PP2D.Examples {
 				}
 				if(i > 0) {
 					AngleConstraint ac = new AngleConstraint(prev2, current, prev, angleStiffness);
-					composite.simElements.Add(ac);
+					composite.AddSimElement(ac);
 				}
 				prev2 = prev;
 				prev = current;
 			}
 
 			PinConstraint rootPin = new PinConstraint(root);
-			composite.simElements.Add(rootPin);
+			composite.AddSimElement(rootPin);
 
-			composite.simElements.Add(firstPin);
+			composite.AddSimElement(firstPin);
 		}
 
 		Vector2 AngleToVector2(float angle) {

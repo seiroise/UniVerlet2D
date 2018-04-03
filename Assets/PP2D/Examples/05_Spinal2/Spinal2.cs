@@ -55,36 +55,36 @@ namespace PP2D.Examples {
 			Vector2 direction = AngleToVec2(angle);
 
 			var tp = new Particle(rootPosition);
-			particleIndices.Add(composite.simElements.Count);
-			composite.simElements.Add(tp);
+			particleIndices.Add(composite.elemNum);
+			composite.AddSimElement(tp, 0);
 
 			var g = new ConstantForceConstraint(tp, gravity);
-			gravityIndices.Add(composite.simElements.Count);
-			composite.simElements.Add(g);
+			gravityIndices.Add(composite.elemNum);
+			composite.AddSimElement(g, 5);
 
 			//var sinWave = new SinWaveForce(tp, Vector2.right, amplitude, timeScale, 0f);
 			//composite.simElements.Add(sinWave);
 
 			for(int i = 1; i < rimbNum; ++i) {
 				var p = new Particle(rootPosition + direction * boneLength * i, damping);
-				particleIndices.Add(composite.simElements.Count);
-				composite.simElements.Add(p);
+				particleIndices.Add(composite.elemNum);
+				composite.AddSimElement(p, 0);
 
 				// var s = new SpringConstraint(tp, p);
 				var s = new DistanceConstraint(tp, p);
-				springIndices.Add(composite.simElements.Count);
-				composite.simElements.Add(s);
+				springIndices.Add(composite.elemNum);
+				composite.AddSimElement(s, 1);
 
 				g = new ConstantForceConstraint(p, gravity);
-				gravityIndices.Add(composite.simElements.Count);
-				composite.simElements.Add(g);
+				gravityIndices.Add(composite.elemNum);
+				composite.AddSimElement(g, 5);
 
 				tp = p;
 			}
 
-			composite.renderingGroups.Add(new SimRenderer.SimRenderingGroup(1, springIndices));
-			composite.renderingGroups.Add(new SimRenderer.SimRenderingGroup(2, gravityIndices));
-			composite.renderingGroups.Add(new SimRenderer.SimRenderingGroup(0, particleIndices));
+			composite.AddRenderingGroup(new SimRenderer.SimRenderingGroup(1, springIndices));
+			composite.AddRenderingGroup(new SimRenderer.SimRenderingGroup(2, gravityIndices));
+			composite.AddRenderingGroup(new SimRenderer.SimRenderingGroup(0, particleIndices));
 
 			return composite;
 		}

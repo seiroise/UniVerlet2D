@@ -41,14 +41,8 @@ namespace PP2D.Examples {
 			_sim = _monoSim.simulator;
 			var composite = MakeClothComposite(rowSize, row, colSize, col, particleDamping, springStiffness, gravity, Vector2.up * 5f, offset);
 
-			for(var i = 0; i < composite.simElements.Count; ++i) {
-				_sim.AddSimElement(composite.simElements[i]);
-			}
-
-			for(var i = 0; i < composite.renderingGroups.Count; ++i) {
-				var group = composite.renderingGroups[i];
-				_simRenderer.AddRenderingGroup(group.groupID, group.indices);
-			}
+			composite.SetSimElementsToSim(_sim);
+			composite.SetRenderingGroupToSim(_simRenderer);
 		}
 
 		Composite MakeClothComposite(float rowSize, int row, float colSize, int col, float particleDamping, float springStiffness, Vector2 gravity, Vector2 rootPosition, Vector2 offset) {
@@ -65,17 +59,17 @@ namespace PP2D.Examples {
 				if(y == 0) {
 					for(var x = 0; x < row; ++x) {
 						var p = new Particle(rootPosition + new Vector2(rowCellSize * x, -colCellSize * y) + offset, particleDamping);
-						particleIndices.Add(composite.simElements.Count);
-						composite.simElements.Add(p);
+						particleIndices.Add(composite.elemNum);
+						composite.AddSimElement(p, 0);
 
 						var pc = new PinConstraint(p);
-						composite.simElements.Add(pc);
+						composite.AddSimElement(p, 10);
 
 						if(x != 0) {
 							var s = new SpringConstraint(rowParticles[x - 1], p, springStiffness);
 							// var s = new DistanceConstraint(rowParticles[x - 1], p);
-							springIndices.Add(composite.simElements.Count);
-							composite.simElements.Add(s);
+							springIndices.Add(composite.elemNum);
+							composite.AddSimElement(s, 1);
 						}
 
 						rowParticles[x] = p;
@@ -83,22 +77,22 @@ namespace PP2D.Examples {
 				} else {
 					for(var x = 0; x < row; ++x) {
 						var p = new Particle(rootPosition + new Vector2(rowCellSize * x, -colCellSize * y) + offset, particleDamping);
-						particleIndices.Add(composite.simElements.Count);
-						composite.simElements.Add(p);
+						particleIndices.Add(composite.elemNum);
+						composite.AddSimElement(p, 0);
 
 						var cfc = new ConstantForceConstraint(p, gravity);
-						composite.simElements.Add(cfc);
+						composite.AddSimElement(cfc, 5);
 
 						var s = new SpringConstraint(rowParticles[x], p, springStiffness);
 						// var s = new DistanceConstraint(rowParticles[x], p);
-						springIndices.Add(composite.simElements.Count);
-						composite.simElements.Add(s);
+						springIndices.Add(composite.elemNum);
+						composite.AddSimElement(s, 1);
 
 						if(x != 0) {
 							s = new SpringConstraint(rowParticles[x - 1], p, springStiffness);
 							// s = new DistanceConstraint(rowParticles[x - 1], p);
-							springIndices.Add(composite.simElements.Count);
-							composite.simElements.Add(s);
+							springIndices.Add(composite.elemNum);
+							composite.AddSimElement(s, 1);
 						}
 
 						rowParticles[x] = p;
@@ -106,10 +100,8 @@ namespace PP2D.Examples {
 				}
 			}
 
-			// composite.simElements = SimElementHelper.ReorderSimElements(composite.simElementSs, "Particle", "SpringConstraint", "PinConstraint");
-
-			composite.renderingGroups.Add(new SimRenderer.SimRenderingGroup(1, springIndices));
-			composite.renderingGroups.Add(new SimRenderer.SimRenderingGroup(0, particleIndices));
+			composite.AddRenderingGroup(new SimRenderer.SimRenderingGroup(1, springIndices));
+			composite.AddRenderingGroup(new SimRenderer.SimRenderingGroup(0, particleIndices));
 
 			return composite;
 		}

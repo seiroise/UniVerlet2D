@@ -26,14 +26,8 @@ namespace PP2D.Examples {
 			_sim = _monoSim.simulator;
 			var composite = MakeSpinalComposite(length, boneNum, Vector2.zero);
 
-			for(var i = 0; i < composite.simElements.Count; ++i) {
-				_sim.AddSimElement(composite.simElements[i]);
-			}
-
-			for(var i = 0; i < composite.renderingGroups.Count; ++i) {
-				var group = composite.renderingGroups[i];
-				_simRenderer.AddRenderingGroup(group.groupID, group.indices);
-			}
+			composite.SetSimElementsToSim(_sim);
+			composite.SetRenderingGroupToSim(_simRenderer);
 		}
 
 		Composite MakeSpinalComposite(float length, int boneNum, Vector2 rootPosition) {
@@ -47,23 +41,23 @@ namespace PP2D.Examples {
 			List<int> springIndices = new List<int>();
 
 			var tp = new Particle(rootPosition);
-			particleIndices.Add(composite.simElements.Count);
-			composite.simElements.Add(tp);
+			particleIndices.Add(composite.elemNum);
+			composite.AddSimElement(tp, 0);
 
 			for(int i = 1; i < boneNum; ++i) {
 				var p = new Particle(rootPosition + new Vector2(0f, -boneLength * i));
-				particleIndices.Add(composite.simElements.Count);
-				composite.simElements.Add(p);
+				particleIndices.Add(composite.elemNum);
+				composite.AddSimElement(p, 0);
 
 				var s = new SpringConstraint(tp, p);
-				springIndices.Add(composite.simElements.Count);
-				composite.simElements.Add(s);
+				springIndices.Add(composite.elemNum);
+				composite.AddSimElement(s, 1);
 
 				tp = p;
 			}
 
-			composite.renderingGroups.Add(new SimRenderer.SimRenderingGroup(1, springIndices));
-			composite.renderingGroups.Add(new SimRenderer.SimRenderingGroup(0, particleIndices));
+			composite.AddRenderingGroup(new SimRenderer.SimRenderingGroup(1, springIndices));
+			composite.AddRenderingGroup(new SimRenderer.SimRenderingGroup(0, particleIndices));
 
 			return composite;
 		}
