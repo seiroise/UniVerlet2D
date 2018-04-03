@@ -10,6 +10,8 @@ namespace UniVerlet2D {
 		Vector2 _pos;
 		Vector2 _oldPos;
 
+		float _damping = 0.9f;
+
 		public Vector2 pos { get { return _pos; } set { _pos = value; } }
 		public Vector2 oldPos { get { return _oldPos; } set { _oldPos = value; } }
 
@@ -17,31 +19,19 @@ namespace UniVerlet2D {
 
 		public Particle() : base(){ }
 
-		public Particle(Simulator sim, Vector2 pos) : base(sim){
+		public Particle(Vector2 pos, float damping = 0.9f) {
 			this._oldPos = this._pos = pos;
 		}
 
-		public void Tick(float dt) {
-			var velocity = (_pos - _oldPos) * _sim.settings.damping;
-			_oldPos = _pos;
-			_pos += _sim.settings.gravity * dt;
-			_pos += velocity;
-		}
-
-		protected override void BeforeSerializeToJson() {
-			
-		}
-
-		public override void AfterDeserializeFromJson(Simulator sim) {
-			_sim = sim;
-			_oldPos = pos;
-		}
-
 		public override void Step(float dt) {
-			var velocity = (_pos - _oldPos) * _sim.settings.damping;
+			var velocity = (_pos - _oldPos) * _damping;
 			_oldPos = _pos;
-			_pos += _sim.settings.gravity * dt;
+			// _pos += _sim.settings.gravity * dt;
 			_pos += velocity;
+		}
+
+		public override Matrix4x4 GetMatrix() {
+			return worldMatrix;
 		}
 	}
 }

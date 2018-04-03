@@ -26,18 +26,20 @@ namespace UniVerlet2D.Lab {
 		 * Methods
 		 */
 
+		public string ExportJson() {
+			return JsonUtility.ToJson(this);
+		}
+
 		public virtual bool SetParams(int uid, string profileID, object[] args) {
 			_uid = uid;
 			_profileID = profileID;
 			return true;
 		}
 
-		public abstract SimElement MakeSimElement(Simulator sim);
+		public abstract SimElement MakeSimElement(AlignedEditableForm aef, List<SimElement> simElements);
 
 		public abstract void AfterImportJson(EditableForm form);
 
-		public string ExportJson() {
-			return JsonUtility.ToJson(this);
-		}
+		public abstract bool ContainsUID(int uid);
 	}
 }

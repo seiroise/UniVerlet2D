@@ -10,13 +10,11 @@ namespace UniVerlet2D {
 
 		[SerializeField]
 		Vector2 _pos;
-		[SerializeField]
-		int _aUID;
 
 		public Particle a { get { return _a; } }
 		public Vector2 pos { get { return _pos; } }
 
-		public PinConstraint(Simulator sim, Particle a, Vector2 pos) : base(sim) {
+		public PinConstraint(Particle a, Vector2 pos) {
 			_a = a;
 			_pos = pos;
 		}
@@ -29,17 +27,12 @@ namespace UniVerlet2D {
 			_a.pos = _pos;
 		}
 
-		protected override void BeforeSerializeToJson() {
-			_aUID = _a.uid;
-		}
-
-		public override void AfterDeserializeFromJson(Simulator sim) {
-			_sim = sim;
-			_a = sim.GetParticleByUID(_aUID);
-		}
-
 		public bool ContainParticle(Particle p) {
 			return _a.uid == p.uid;
+		}
+
+		public override Matrix4x4 GetMatrix() {
+			return _a.GetMatrix();
 		}
 	}
 }

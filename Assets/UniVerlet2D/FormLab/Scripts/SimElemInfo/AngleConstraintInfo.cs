@@ -35,8 +35,15 @@ namespace UniVerlet2D.Lab {
 		 * Methods
 		 */
 
-		public override SimElement MakeSimElement(Simulator sim) {
-			return null;
+		public override SimElement MakeSimElement(AlignedEditableForm aef, List<SimElement> simElements) {
+			var a = simElements[aef.uid2idxDic[_aUID]] as Particle;
+			var b = simElements[aef.uid2idxDic[_bUID]] as Particle;
+			var m = simElements[aef.uid2idxDic[_mUID]] as Particle;
+
+			var ac = new AngleConstraint(a, b, m, _stiffness);
+			ac.OverrideUID(uid);
+
+			return ac;
 		}
 
 		public override bool SetParams(int uid, string profileID, object[] args) {
@@ -63,6 +70,10 @@ namespace UniVerlet2D.Lab {
 			_a = form.GetByUID(_aUID) as ParticleInfo;
 			_b = form.GetByUID(_bUID) as ParticleInfo;
 			_m = form.GetByUID(_mUID) as ParticleInfo;
+		}
+
+		public override bool ContainsUID(int uid) {
+			return _a.uid == uid || _b.uid == uid || _m.uid == uid;
 		}
 	}
 }

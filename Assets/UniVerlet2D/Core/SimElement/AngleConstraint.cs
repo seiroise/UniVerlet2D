@@ -19,9 +19,6 @@ namespace UniVerlet2D {
 		[SerializeField]
 		float _angle;
 
-		[SerializeField]
-		int _aUID, _bUID, _mUID;
-
 		/*
 		 * Properties
 		 */
@@ -39,34 +36,18 @@ namespace UniVerlet2D {
 		 * Constructors
 		 */
 
-		public AngleConstraint(Simulator sim, Particle a, Particle b, Particle m, float stiffness = 1f) : base(sim) {
+		public AngleConstraint(Particle a, Particle b, Particle m, float stiffness = 1f) {
 			_a = a;
 			_b = b;
 			_m = m;
 
 			_stiffness = stiffness;
 			_angle = DeltaAngle(a.pos, b.pos, m.pos);
-
-			_aUID = _a.uid;
-			_bUID = _b.uid;
-			_mUID = _m.uid;
 		}
 
 		/*
 		 * Functions
 		 */
-
-		public void Relax(float dt) {
-			var angle = DeltaAngle(_a.pos, _b.pos, _m.pos);
-			var diff = DeltaAngle(_angle, angle);
-			diff *= dt * _stiffness * _sim.settings.angleConstant;
-
-			_a.pos = Rotate(_a.pos, _m.pos, diff);
-			_b.pos = Rotate(_b.pos, _m.pos, -diff);
-
-			_m.pos = Rotate(_m.pos, _a.pos, diff);
-			_m.pos = Rotate(_m.pos, _b.pos, -diff);
-		}
 
 		float DeltaAngle(Vector2 a, Vector2 b, Vector2 m) {
 			float angle1 = Mathf.Atan2(a.y - m.y, a.x - m.x);
@@ -95,23 +76,10 @@ namespace UniVerlet2D {
 				angleSin * dx + angleCos * dy + axis.y);
 		}
 
-		protected override void BeforeSerializeToJson() {
-			_aUID = _a.uid;
-			_bUID = _b.uid;
-			_mUID = _m.uid;
-		}
-
-		public override void AfterDeserializeFromJson(Simulator sim) {
-			_sim = sim;
-			_a = sim.GetParticleByUID(_aUID);
-			_b = sim.GetParticleByUID(_bUID);
-			_m = sim.GetParticleByUID(_mUID);
-		}
-
 		public override void Step(float dt) {
 			var angle = DeltaAngle(_a.pos, _b.pos, _m.pos);
 			var diff = DeltaAngle(_angle, angle);
-			diff *= dt * _stiffness * _sim.settings.angleConstant;
+			diff *= dt * _stiffness;
 
 			_a.pos = Rotate(_a.pos, _m.pos, diff);
 			_b.pos = Rotate(_b.pos, _m.pos, -diff);
@@ -122,6 +90,10 @@ namespace UniVerlet2D {
 
 		public bool ContainParticle(Particle p) {
 			return _a.uid == p.uid || _b.uid == p.uid || _m.uid == p.uid;
+		}
+
+		public override Matrix4x4 GetMatrix() {
+			return _m.GetMatrix();
 		}
 	}
 }

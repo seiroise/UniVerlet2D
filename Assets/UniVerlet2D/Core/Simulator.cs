@@ -37,6 +37,8 @@ namespace UniVerlet2D {
 		[SerializeField, HideInInspector]
 		Data.Form _serializedForm;
 
+		List<SimElement> _simElements;
+
 		/*
 		 * Properties
 		 */
@@ -73,18 +75,12 @@ namespace UniVerlet2D {
 			// particles
 			for(var i = 0; i < numOfParticles; ++i) {
 				var p = _particles[i];
-				p.Tick(dt);
-				/*
-				var velocity = (p.pos - p.oldPos) * _settings.damping;
-				p.oldPos = p.pos;
-				p.pos += _settings.gravity * dt;
-				p.pos += velocity;
-				*/
+				p.Step(dt);
 			}
 
 			// interact
 			for(var i = 0; i < numOfStretchs; ++i) {
-				_stretchs[i].Apply(dt);
+				_stretchs[i].Step(dt);
 			}
 
 			// relax
@@ -92,10 +88,10 @@ namespace UniVerlet2D {
 				_springs[i].Step(dt);
 			}
 			for(var i = 0; i < numOfAngles; ++i) {
-				_angles[i].Relax(dt);
+				_angles[i].Step(dt);
 			}
 			for(var i = 0; i < numOfPins; ++i) {
-				_pins[i].Relax(dt);
+				_pins[i].Step(dt);
 			}
 		}
 
@@ -179,7 +175,7 @@ namespace UniVerlet2D {
 		 */
 
 		public Particle MakeParticle(Vector2 pos) {
-			var p = new Particle(this, pos);
+			var p = new Particle(pos);
 			_particles.Add(p);
 			return p;
 		}
@@ -292,7 +288,7 @@ namespace UniVerlet2D {
 		 */
 
 		public SpringConstraint MakeSpring(Particle a, Particle b, float stiffness = 1f) {
-			var s = new SpringConstraint(this, a, b, stiffness);
+			var s = new SpringConstraint(a, b, stiffness);
 			_springs.Add(s);
 			return s;
 		}
@@ -350,7 +346,7 @@ namespace UniVerlet2D {
 		 */
 
 		public AngleConstraint MakeAngle(Particle a, Particle b, Particle m, float stiffness = 1f) {
-			var an = new AngleConstraint(this, a, b, m, stiffness);
+			var an = new AngleConstraint(a, b, m, stiffness);
 			_angles.Add(an);
 			return an;
 		}
@@ -416,7 +412,7 @@ namespace UniVerlet2D {
 		}
 
 		public PinConstraint MakePin(Particle p, Vector2 pinnedPos) {
-			var pin = new PinConstraint(this, p, pinnedPos);
+			var pin = new PinConstraint(p, pinnedPos);
 			_pins.Add(pin);
 			return pin;
 		}
@@ -461,7 +457,7 @@ namespace UniVerlet2D {
 		 */
 
 		public StretchInteraction MakeStretch(Particle a, Particle b) {
-			var stretch = new StretchInteraction(this, a, b);
+			var stretch = new StretchInteraction(a, b);
 			_stretchs.Add(stretch);
 			return stretch;
 		}
@@ -618,23 +614,23 @@ namespace UniVerlet2D {
 			FormText formText = new FormText();
 			var sb = new System.Text.StringBuilder();
 			for(var i = 0; i < numOfParticles; ++i) {
-				var e = GetParticleAt(i);
-				sb.AppendLine(string.Format("p {0}", e.ExportJson()));
+				// var e = GetParticleAt(i);
+				//sb.AppendLine(string.Format("p {0}", e.ExportJson()));
 			}
 			sb.AppendLine();
 			for(var i = 0; i < numOfSprings; ++i) {
-				var e = GetSpringAt(i);
-				sb.AppendLine(string.Format("sc {0}", e.ExportJson()));
+				// var e = GetSpringAt(i);
+				// sb.AppendLine(string.Format("sc {0}", e.ExportJson()));
 			}
 			sb.AppendLine();
 			for(var i = 0; i < numOfAngles; ++i) {
-				var e = GetAngleAt(i);
-				sb.AppendLine(string.Format("ac {0}", e.ExportJson()));
+				// var e = GetAngleAt(i);
+				// sb.AppendLine(string.Format("ac {0}", e.ExportJson()));
 			}
 			sb.AppendLine();
 			for(var i = 0; i < numOfPins; ++i) {
-				var e = GetPinAt(i);
-				sb.AppendLine(string.Format("pc {0}", e.ExportJson()));
+				// var e = GetPinAt(i);
+				// sb.AppendLine(string.Format("pc {0}", e.ExportJson()));
 			}
 
 			formText.text = sb.ToString();
