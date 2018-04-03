@@ -7,6 +7,7 @@ namespace PP2D.Examples {
 	[RequireComponent(typeof(ISimHolder), typeof(SimRenderer))]
 	public class Cloth : MonoBehaviour {
 
+		[Header("Generate settings")]
 		[Range(2, 32)]
 		public int row = 10;
 		[Range(2, 32)]
@@ -16,6 +17,8 @@ namespace PP2D.Examples {
 		public float rowSize = 5f;
 		[Range(2f, 10f)]
 		public float colSize = 5f;
+
+		public Vector2 offset;
 
 		[Header("SimElement settings")]
 		[Range(0.001f, 0.999f)]
@@ -36,7 +39,7 @@ namespace PP2D.Examples {
 
 		void Start() {
 			_sim = _monoSim.simulator;
-			var composite = MakeClothComposite(rowSize, row, colSize, col, particleDamping, springStiffness, gravity, Vector2.up * 5f);
+			var composite = MakeClothComposite(rowSize, row, colSize, col, particleDamping, springStiffness, gravity, Vector2.up * 5f, offset);
 
 			for(var i = 0; i < composite.simElements.Count; ++i) {
 				_sim.AddSimElement(composite.simElements[i]);
@@ -48,7 +51,7 @@ namespace PP2D.Examples {
 			}
 		}
 
-		Composite MakeClothComposite(float rowSize, int row, float colSize, int col, float particleDamping, float springStiffness, Vector2 gravity, Vector2 rootPosition) {
+		Composite MakeClothComposite(float rowSize, int row, float colSize, int col, float particleDamping, float springStiffness, Vector2 gravity, Vector2 rootPosition, Vector2 offset) {
 			float rowCellSize = rowSize / row;
 			float colCellSize = colSize / col;
 
@@ -61,7 +64,7 @@ namespace PP2D.Examples {
 			for(var y = 0; y < col; ++y) {
 				if(y == 0) {
 					for(var x = 0; x < row; ++x) {
-						var p = new Particle(rootPosition + new Vector2(rowCellSize * x, -colCellSize * y), particleDamping);
+						var p = new Particle(rootPosition + new Vector2(rowCellSize * x, -colCellSize * y) + offset, particleDamping);
 						particleIndices.Add(composite.simElements.Count);
 						composite.simElements.Add(p);
 
@@ -70,6 +73,7 @@ namespace PP2D.Examples {
 
 						if(x != 0) {
 							var s = new SpringConstraint(rowParticles[x - 1], p, springStiffness);
+							// var s = new DistanceConstraint(rowParticles[x - 1], p);
 							springIndices.Add(composite.simElements.Count);
 							composite.simElements.Add(s);
 						}
@@ -78,7 +82,7 @@ namespace PP2D.Examples {
 					}
 				} else {
 					for(var x = 0; x < row; ++x) {
-						var p = new Particle(rootPosition + new Vector2(rowCellSize * x, -colCellSize * y), particleDamping);
+						var p = new Particle(rootPosition + new Vector2(rowCellSize * x, -colCellSize * y) + offset, particleDamping);
 						particleIndices.Add(composite.simElements.Count);
 						composite.simElements.Add(p);
 
@@ -86,11 +90,13 @@ namespace PP2D.Examples {
 						composite.simElements.Add(cfc);
 
 						var s = new SpringConstraint(rowParticles[x], p, springStiffness);
+						// var s = new DistanceConstraint(rowParticles[x], p);
 						springIndices.Add(composite.simElements.Count);
 						composite.simElements.Add(s);
 
 						if(x != 0) {
 							s = new SpringConstraint(rowParticles[x - 1], p, springStiffness);
+							// s = new DistanceConstraint(rowParticles[x - 1], p);
 							springIndices.Add(composite.simElements.Count);
 							composite.simElements.Add(s);
 						}

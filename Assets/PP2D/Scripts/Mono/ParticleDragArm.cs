@@ -26,7 +26,7 @@ namespace PP2D {
 		void Start() {
 			_sim = _simHolder.simulator;
 			_sim.onChangeComposition.AddListener(OnChangeSimComposition);
-			_particles = _sim.FindSimElems<Particle>();
+			_particles = _sim.GetSimElems<Particle>();
 		}
 
 		void LateUpdate() {
@@ -37,7 +37,8 @@ namespace PP2D {
 			if(!_isDragging) {
 				if(Input.GetMouseButtonDown(0)) {
 					int idx;
-					if(SimElementHelper.FindOverlapParticleIdx(_particles, pos, _particleRadius, out idx)) {
+					Matrix4x4 mat = transform.localToWorldMatrix;
+					if(SimElementHelper.FindOverlapParticleIdx(_particles, mat, pos, _particleRadius, out idx)) {
 						_isDragging = true;
 						_draggedParticle = _particles[idx];
 					}
@@ -46,14 +47,13 @@ namespace PP2D {
 				if(Input.GetMouseButtonUp(0)) {
 					_isDragging = false;
 				} else if(Input.GetMouseButton(0)) {
-					_draggedParticle.pos = pos;
+					_draggedParticle.pos = transform.worldToLocalMatrix.MultiplyPoint3x4(pos);
 				}
 			}
 		}
 
 		void OnChangeSimComposition() {
-			_particles = _sim.FindSimElems<Particle>();
-			Debug.Log("パーティクルの数は" + _particles.Count);
+			_particles = _sim.GetSimElems<Particle>();
 		}
 	}
 }

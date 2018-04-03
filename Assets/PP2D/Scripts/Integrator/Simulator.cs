@@ -8,6 +8,16 @@ namespace PP2D {
 	[System.Serializable]
 	public class Simulator {
 
+		public class SimulationOrder {
+			public int order;
+			public List<SimElement> simElements;
+
+			public SimulationOrder(int order) {
+				this.order = order;
+				this.simElements = new List<SimElement>();
+			}
+		}
+
 		[System.Serializable]
 		public class ChangeCompositionEvent : UnityEvent { }
 
@@ -18,6 +28,9 @@ namespace PP2D {
 		List<SimElement> _simElements;
 		[SerializeField]
 		ChangeCompositionEvent _onChangeComposition;
+		bool isDirty;
+
+		List<SimulationOrder> _simulationOrders = new List<SimulationOrder>();
 
 		/*
 		 * Properties
@@ -40,12 +53,18 @@ namespace PP2D {
 
 		public void Init(bool withClear = true) {
 			_simElements = new List<SimElement>();
+			_simulationOrders = new List<SimulationOrder>();
 		}
 
 		public void Update(float dt) {
 			for(var i = 0; i < _simElements.Count; ++i) {
 				var element = _simElements[i];
 				element.Step(dt);
+			}
+
+			if(isDirty && _onChangeComposition != null) {
+				_onChangeComposition.Invoke();
+				isDirty = false;
 			}
 		}
 
@@ -67,9 +86,7 @@ namespace PP2D {
 
 		public void AddSimElement(SimElement simElem) {
 			_simElements.Add(simElem);
-			if(_onChangeComposition != null) {
-				_onChangeComposition.Invoke();
-			}
+			isDirty = true;
 		}
 
 		public SimElement GetSimElementAt(int idx) {
@@ -82,14 +99,16 @@ namespace PP2D {
 		public void RemoveSimElementAt(int idx) {
 			if(IsRangeInside(idx)) {
 				_simElements.RemoveAt(idx);
-				if(_onChangeComposition != null) {
-					_onChangeComposition.Invoke();
-				}
+				isDirty = true;
 			}
 		}
 
-		public List<T> FindSimElems<T>() where T : SimElement {
-			return SimElementHelper.FindSimElems<T>(_simElements);
+		public List<T> GetSimElems<T>() where T : SimElement {
+			return SimElementHelper.GetSimElems<T>(_simElements);
+		}
+
+		public List<int> GetSimElemIndices<T>() where T : SimElement {
+			return SimElementHelper.GetSimElemIndices<T>(_simElements);
 		}
 
 		/*

@@ -11,6 +11,7 @@ namespace PP2D {
 		 */
 
 		static readonly float TWO_PI = Mathf.PI + Mathf.PI;
+		static readonly float MAX_ANGLE = Mathf.PI - 0.1f;
 
 		Particle _a, _b, _m;
 
@@ -79,7 +80,12 @@ namespace PP2D {
 		public override void Step(float dt) {
 			var angle = DeltaAngle(_a.pos, _b.pos, _m.pos);
 			var diff = DeltaAngle(_angle, angle);
-			diff *= dt * _stiffness;
+			diff = diff * dt * _stiffness;
+			if(diff > MAX_ANGLE) {
+				diff = MAX_ANGLE;
+			} else if(diff < -MAX_ANGLE) {
+				diff = -MAX_ANGLE;
+			}
 
 			_a.pos = Rotate(_a.pos, _m.pos, diff);
 			_b.pos = Rotate(_b.pos, _m.pos, -diff);

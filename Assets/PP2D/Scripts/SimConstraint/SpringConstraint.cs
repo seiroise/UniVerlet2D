@@ -15,9 +15,9 @@ namespace PP2D {
 		[SerializeField]
 		float _stiffness;
 		[SerializeField]
-		float _length;
+		float _relaxLength;
 		[SerializeField]
-		float _sqrLength;
+		float _sqrRelaxLength;
 
 		/*
 		 * Properties
@@ -28,7 +28,7 @@ namespace PP2D {
 
 		public float stiffness { get { return _stiffness; } set { _stiffness = value; } }
 
-		public float length { get { return _length; } }
+		public float relaxLength { get { return _relaxLength; } }
 
 		public float currentLength { get { return (_a.pos - _b.pos).magnitude; } }
 		public Vector2 middlePos { get { return (_a.pos + _b.pos) * 0.5f; } }
@@ -42,8 +42,8 @@ namespace PP2D {
 			_a = a;
 			_b = b;
 			_stiffness = stiffness;
-			_length = (a.pos - b.pos).magnitude;
-			_sqrLength = (a.pos - b.pos).sqrMagnitude;
+			_relaxLength = (a.pos - b.pos).magnitude;
+			_sqrRelaxLength = (a.pos - b.pos).sqrMagnitude;
 		}
 
 		/*
@@ -51,11 +51,11 @@ namespace PP2D {
 		 */
 
 		public override void Step(float dt) {
-			var normal = _a.pos - _b.pos;
-			var sqrLength = normal.sqrMagnitude;
-			normal *= ((_sqrLength - sqrLength) / sqrLength) * _stiffness * dt;
-			_a.pos += normal;
-			_b.pos -= normal;
+			var diff = _a.pos - _b.pos;
+			var sqrLength = diff.sqrMagnitude;
+			diff *= ((_sqrRelaxLength - sqrLength) / sqrLength) * _stiffness * dt;
+			_a.pos += diff;
+			_b.pos -= diff;
 		}
 
 		public bool ContainParticle(Particle p) {

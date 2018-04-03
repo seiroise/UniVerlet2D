@@ -9,7 +9,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c8552dff03d4e4020ac9cecbfb2eafc2, type: 3}
-  m_Name: SpinalDemoRenderingSettings
+  m_Name: Spinal2DemoRenderingSettings
   m_EditorClassIdentifier: 
   renderingGroupSettings:
   - name: 
@@ -24,7 +24,7 @@ MonoBehaviour:
     - {x: 0, y: 1}
     - {x: 1, y: 0}
     - {x: 1, y: 1}
-    color: {r: 1, g: 1, b: 1, a: 1}
+    color: {r: 0.934, g: 0.686363, b: 0.38854402, a: 1}
   - name: 
     id: 1
     positions:
@@ -37,4 +37,17 @@ MonoBehaviour:
     - {x: 0, y: 1}
     - {x: 1, y: 0}
     - {x: 1, y: 1}
-    color: {r: 1, g: 1, b: 1, a: 1}
+    color: {r: 0.934, g: 0.686363, b: 0.38854402, a: 1}
+  - name: 
+    id: 2
+    positions:
+    - {x: 0.6, y: 0, z: 0}
+    - {x: 0, y: 0.6, z: 0}
+    - {x: 0, y: -0.6, z: 0}
+    - {x: -0.6, y: 0, z: 0}
+    uvs:
+    - {x: 0, y: 0}
+    - {x: 0, y: 1}
+    - {x: 1, y: 0}
+    - {x: 1, y: 1}
+    color: {r: 0.85294116, g: 0.49545845, b: 0.49545845, a: 1}

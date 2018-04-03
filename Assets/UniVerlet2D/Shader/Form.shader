@@ -6,10 +6,10 @@
 	SubShader {
 		Tags { "RenderType"="Transparent" "Queue"="Transparent" }
 
-		Blend One OneMinusSrcAlpha
 		Cull Off
 		Lighting Off
 		ZWrite Off
+		Blend SrcAlpha OneMinusSrcAlpha
 
 		Pass {
 
